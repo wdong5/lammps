@@ -14,6 +14,9 @@
 /* ----------------------------------------------------------------------
    Contributing author: Aidan Thompson (SNL)
 ------------------------------------------------------------------------- */
+#include <tensorflow/core/platform/env.h>
+#include <tensorflow/core/public/session.h>
+#include <iostream>
 
 #include <cmath>
 #include <cstdio>
@@ -32,10 +35,13 @@
 #include "error.h"
 
 using namespace LAMMPS_NS;
+using namespace tensorflow;
 
 #define MAXLINE 1024
 #define DELTA 4
 
+Session* session;
+Status status = NewSession(SessionOptions(), &session);
 /* ---------------------------------------------------------------------- */
 
 PairSW::PairSW(LAMMPS *lmp) : Pair(lmp)
