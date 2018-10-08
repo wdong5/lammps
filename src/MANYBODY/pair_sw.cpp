@@ -40,8 +40,7 @@ using namespace tensorflow;
 #define MAXLINE 1024
 #define DELTA 4
 
-Session* session;
-Status status = NewSession(SessionOptions(), &session);
+
 /* ---------------------------------------------------------------------- */
 
 PairSW::PairSW(LAMMPS *lmp) : Pair(lmp)
@@ -95,7 +94,10 @@ void PairSW::compute(int eflag, int vflag)
   double rsq,rsq1,rsq2;
   double delr1[3],delr2[3],fj[3],fk[3];
   int *ilist,*jlist,*numneigh,**firstneigh;
-
+  
+  Session* session;
+  Status status = NewSession(SessionOptions(), &session);
+   
   evdwl = 0.0;
   if (eflag || vflag) ev_setup(eflag,vflag);
   else evflag = vflag_fdotr = 0;
