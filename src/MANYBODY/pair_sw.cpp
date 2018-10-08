@@ -97,6 +97,11 @@ void PairSW::compute(int eflag, int vflag)
   
   Session* session;
   Status status = NewSession(SessionOptions(), &session);
+  if (!status.ok()) {
+        cout << status.ToString() << "\n";
+        return 1;
+    }
+  cout << "Session successfully created.\n";
    
   evdwl = 0.0;
   if (eflag || vflag) ev_setup(eflag,vflag);
