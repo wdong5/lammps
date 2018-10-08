@@ -34,6 +34,7 @@
 #include "memory.h"
 #include "error.h"
 
+using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
 
