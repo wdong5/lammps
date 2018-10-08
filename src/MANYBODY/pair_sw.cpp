@@ -100,7 +100,7 @@ void PairSW::compute(int eflag, int vflag)
   Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
         cout << status.ToString() << "\n";
-        return 1;
+        //return 1;
     }
   cout << "Session successfully created.\n";
    
