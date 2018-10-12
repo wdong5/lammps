@@ -1,0 +1,15 @@
+This LAMMPS simulation made specific use of work described in the
+following references.  See http://lammps.sandia.gov/cite.html
+for details.
+
+USER-EFF package:
+
+@Article{Jaramillo-Botero11,
+ author = {A. Jaramillo-Botero, J. Su, A. Qi, W. A. Goddard III},
+ title = {Large-Scale, Long-Term Nonadiabatic Electron Molecular Dynamics for Describing Material Properties and Phenomena in Extreme Environments},
+ journal = {J.~Comp.~Chem.},
+ year =    2011,
+ volume =  32,
+ pages =   {497--512}
+}
+
