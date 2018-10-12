@@ -1,0 +1,21 @@
+LAMMPS (18 Sep 2018)
+OMP_NUM_THREADS environment is not set. Defaulting to 1 thread. (src/comm.cpp:87)
+  using 1 OpenMP thread(s) per MPI task
+# bulk Si via Stillinger-Weber
+
+units		metal
+atom_style	atomic
+
+lattice		diamond 5.431
+Lattice spacing in x,y,z = 5.431 5.431 5.431
+region		box block 0 20 0 20 0 10
+create_box	1 box
+Created orthogonal box = (0 0 0) to (108.62 108.62 54.31)
+  1 by 1 by 1 MPI processor grid
+create_atoms	1 box
+Created 32000 atoms
+  Time spent = 0.013458 secs
+
+pair_style	sw
+ERROR: Unknown pair style sw (src/force.cpp:262)
+Last command: pair_style	sw
