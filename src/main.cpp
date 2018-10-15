@@ -18,6 +18,8 @@
 #include <cstdio>
 #include <cstdlib>
 
+
+
 #if defined(LAMMPS_TRAP_FPE) && defined(_GNU_SOURCE)
 #include <fenv.h>
 #endif
@@ -25,13 +27,17 @@
 #ifdef FFT_FFTW3
 #include <fftw3.h>
 #endif
-
+#include <iostream>
+#include <time.h>
+#include <sys/time.h>
+using namespace std;
 using namespace LAMMPS_NS;
 
 /* ----------------------------------------------------------------------
    main program to drive LAMMPS
 ------------------------------------------------------------------------- */
-
+struct timeval start_bp8, end_bp8;
+double bp8; 
 int main(int argc, char **argv)
 {
   MPI_Init(&argc,&argv);
