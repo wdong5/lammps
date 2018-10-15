@@ -34,6 +34,7 @@
 #include "reaxc_list.h"
 #include "reaxc_vector.h"
 
+using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
 
@@ -66,14 +67,14 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }else{
-     cout << "Session successfully created.\n";
+    std::cout << "Session successfully created.\n";
   }
   // Read in the protobuf graph we exported
   // (The path seems to be relative to the cwd. Keep this in mind
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "graph.pb", &graph_def);
+  tensorflow::status = ReadBinaryProto(Env::Default(), "graph.pb", &graph_def);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }
