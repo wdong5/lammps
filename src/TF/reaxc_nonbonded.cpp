@@ -26,6 +26,8 @@
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
 #include <iostream>
+#include <time.h>
+#include <sys/time.h>
 
 #include "pair_reaxc.h"
 #include "reaxc_types.h"
@@ -38,6 +40,8 @@ using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
 
+extern struct timeval start_bp8, end_bp8;
+extern double bp8;
 
 void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                          simulation_data *data, storage *workspace,
@@ -67,7 +71,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }else{
-    std::cout << "Session successfully created.\n";
+   // std::cout << "Session successfully created.\n";
   }
   // Read in the protobuf graph we exported
   // (The path seems to be relative to the cwd. Keep this in mind
@@ -78,9 +82,14 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }
-  
-  
-  
+ gettimeofday( &start_bp8, NULL );
+ // Add the graph to the session
+  status = session->Create(graph_def);
+  if (!status.ok()) {
+    std::cout << status.ToString() << "\n";
+  }
+ gettimeofday( &end_bp8, NULL );
+ bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec; 
   
   
   // Tallying variables:
