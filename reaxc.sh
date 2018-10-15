@@ -1,6 +1,5 @@
 #!/bin/sh
 # This is a comment!
-
 cd build/
 rm -rf *
 git pull origin master
