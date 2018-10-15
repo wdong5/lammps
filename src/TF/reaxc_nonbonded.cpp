@@ -65,6 +65,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
+  }else{
+     cout << "Session successfully created.\n";
   }
   // Read in the protobuf graph we exported
   // (The path seems to be relative to the cwd. Keep this in mind
