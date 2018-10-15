@@ -57,13 +57,27 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   far_neighbor_data *nbr_pj;
   reax_list *far_nbrs;
 
+  
+  
+  
   //construct a ML graph;
   Session* session;
   Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
-    return 1;
   }
+  // Read in the protobuf graph we exported
+  // (The path seems to be relative to the cwd. Keep this in mind
+  // when using `bazel run` since the cwd isn't where you call
+  // `bazel run` but from inside a temp folder.)
+  GraphDef graph_def;
+  status = ReadBinaryProto(Env::Default(), "models/graph.pb", &graph_def);
+  if (!status.ok()) {
+    std::cout << status.ToString() << "\n";
+  }
+  
+  
+  
   
   
   // Tallying variables:
