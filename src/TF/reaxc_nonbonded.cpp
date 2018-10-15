@@ -71,7 +71,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  status = ReadBinaryProto(Env::Default(), "models/graph.pb", &graph_def);
+  status = ReadBinaryProto(Env::Default(), "graph.pb", &graph_def);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }
