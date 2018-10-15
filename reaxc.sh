@@ -1,7 +1,7 @@
 #!/bin/sh
 # This is a comment!
 
-cd build/
+cd ../../build/
 rm -rf *
 git pull origin master
 cmake ../cmake -DPKG_TF=YES
