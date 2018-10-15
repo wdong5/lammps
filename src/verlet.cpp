@@ -34,8 +34,15 @@
 #include "memory.h"
 #include "error.h"
 
+#include <time.h>
+#include <sys/time.h>
+#include <iostream>
+using namespace std;
+
 using namespace LAMMPS_NS;
 
+extern struct timeval start_bp8, end_bp8;
+extern double bp8;
 /* ---------------------------------------------------------------------- */
 
 Verlet::Verlet(LAMMPS *lmp, int narg, char **arg) :
@@ -133,8 +140,10 @@ void Verlet::setup(int flag)
 
   if (pair_compute_flag) force->pair->compute(eflag,vflag);
   else if (force->pair) force->pair->compute_dummy(eflag,vflag);
-
+  std::cout << "Breakpoint8 vdWaals Calculations time: " << bp8 << std::endl; 
+   
   if (atom->molecular) {
+     
     if (force->bond) force->bond->compute(eflag,vflag);
     if (force->angle) force->angle->compute(eflag,vflag);
     if (force->dihedral) force->dihedral->compute(eflag,vflag);
