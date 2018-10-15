@@ -62,8 +62,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   
   
   //construct a ML graph;
-  Session* session;
-  Status status = NewSession(SessionOptions(), &session);
+   tensorflow::Session* session;
+  tensorflow::Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }else{
@@ -74,7 +74,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   // when using `bazel run` since the cwd isn't where you call
   // `bazel run` but from inside a temp folder.)
   GraphDef graph_def;
-  tensorflow::status = ReadBinaryProto(Env::Default(), "graph.pb", &graph_def);
+  status = tensorflow::ReadBinaryProto(Env::Default(), "graph.pb", &graph_def);
   if (!status.ok()) {
     std::cout << status.ToString() << "\n";
   }
