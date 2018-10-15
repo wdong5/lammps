@@ -23,6 +23,9 @@
   See the GNU General Public License for more details:
   <http://www.gnu.org/licenses/>.
   ----------------------------------------------------------------------*/
+#include <tensorflow/core/platform/env.h>
+#include <tensorflow/core/public/session.h>
+#include <iostream>
 
 #include "pair_reaxc.h"
 #include "reaxc_types.h"
@@ -30,6 +33,10 @@
 #include "reaxc_bond_orders.h"
 #include "reaxc_list.h"
 #include "reaxc_vector.h"
+
+using namespace LAMMPS_NS;
+using namespace tensorflow;
+
 
 void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                          simulation_data *data, storage *workspace,
@@ -50,6 +57,15 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   far_neighbor_data *nbr_pj;
   reax_list *far_nbrs;
 
+  //construct a ML graph;
+  Session* session;
+  Status status = NewSession(SessionOptions(), &session);
+  if (!status.ok()) {
+    std::cout << status.ToString() << "\n";
+    return 1;
+  }
+  
+  
   // Tallying variables:
   double pe_vdw, f_tmp, delij[3];
 
