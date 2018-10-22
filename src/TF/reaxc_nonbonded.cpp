@@ -144,7 +144,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout << status.ToString() << "\n";
 		  }
 		
-
+		  data->my_en.e_vdW = tf.to_double(outputs[0],name='ToDouble');
+		  data->my_en.e_ele = tf.to_double(outputs[1],name='ToDouble');
+		  CEvd = tf.to_double(outputs[2],name='ToDouble');
+		  CEclmb = tf.to_double(outputs[3],name='ToDouble');
+		  
 		  // Free any resources used by the session
 		  session->Close();
           gettimeofday( &end_bp8, NULL );
