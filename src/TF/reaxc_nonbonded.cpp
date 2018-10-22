@@ -126,8 +126,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
-		  Tensor a(DT_FLOAT, TensorShape(7));
-		  a.vec<float>()(0)  = nbr_pj->d;
+		Tensor a(DT_FLOAT, TensorShape({7}));
+		  a.vec<float>()(0) = nbr_pj->d;
 		  a.vec<float>()(1) = twbp->gamma;
 		  a.vec<float>()(2) = twbp->D;
 		  a.vec<float>()(3) = twbp->alpha;
