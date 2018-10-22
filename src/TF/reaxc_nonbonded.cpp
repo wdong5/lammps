@@ -142,17 +142,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  status = session->Run(inputs, {"c"}, {}, &outputs);
 		  if (!status.ok()) {
 			std::cout << status.ToString() << "\n";
-			return 1;
 		  }
 		
-		  data->my_en.e_vdW = outputs[0].scalar<float>();
-		  data->my_en.e_ele = outputs[1].scalar<float>();
-		  CEvd = outputs[2].scalar<float>();
-		  CEclmb = outputs[3].scalar<float>();
-		  
+
 		  // Free any resources used by the session
 		  session->Close();
-		  return 0;
           gettimeofday( &end_bp8, NULL );
           bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 		  
