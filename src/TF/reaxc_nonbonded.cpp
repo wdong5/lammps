@@ -144,10 +144,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout << status.ToString() << "\n";
 		  }
 		
-		  data->my_en.e_vdW = outputs[0].scalar<float>();
-		  data->my_en.e_ele = outputs[1].scalar<float>();
-		  CEvd = outputs[2].scalar<float>();
-		  CEclmb = outputs[3].scalar<float>();
+		  data->my_en.e_vdW = outputs[0].scalar<double>();
+		  data->my_en.e_ele = outputs[1].scalar<double>();
+		  CEvd = outputs[2].scalar<double>();
+		  CEclmb = outputs[3].scalar<double>();
 		  
 		  // Free any resources used by the session
 		  session->Close();
