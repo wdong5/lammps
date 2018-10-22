@@ -126,20 +126,20 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
-		  Tensor a(DT_FLOAT, TensorShape({1,7}));
+		  Tensor a(DT_FLOAT, TensorShape(7));
 		  a.vec<float>()(0)  = nbr_pj->d;
-		  a.vec<float>(0)(1) = twbp->gamma;
-		  a.vec<float>(0)(2) = twbp->D;
-		  a.vec<float>(0)(3) = twbp->alpha;
-		  a.vec<float>(0)(4) = twbp->r_vdW;
-		  a.vec<float>(0)(5) = twbp->lgcij;
-		  a.vec<float>(0)(6) = twbp->gamma_w;
+		  a.vec<float>()(1) = twbp->gamma;
+		  a.vec<float>()(2) = twbp->D;
+		  a.vec<float>()(3) = twbp->alpha;
+		  a.vec<float>()(4) = twbp->r_vdW;
+		  a.vec<float>()(5) = twbp->lgcij;
+		  a.vec<float>()(6) = twbp->gamma_w;
 		  
-		  Tensor b(DT_FLOAT, TensorShape({1,4}));
-		  a.vec<float>(0)(0) = data->my_en.e_vdW;
-		  a.vec<float>(0)(1) = data->my_en.e_ele;
-		  a.vec<float>(0)(2) = CEvd;
-		  a.vec<float>(0)(3) = CEclmb;
+		  Tensor b(DT_FLOAT, TensorShape(4));
+		  a.vec<float>()(0) = data->my_en.e_vdW;
+		  a.vec<float>()(1) = data->my_en.e_ele;
+		  a.vec<float>()(2) = CEvd;
+		  a.vec<float>()(3) = CEclmb;
 		  
 
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
