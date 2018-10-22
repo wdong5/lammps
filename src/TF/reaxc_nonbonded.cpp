@@ -134,19 +134,25 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  a.vec<float>()(4) = twbp->r_vdW;
 		  a.vec<float>()(5) = twbp->lgcij;
 		  a.vec<float>()(6) = twbp->gamma_w;
-		  
-		  Tensor b(DT_FLOAT, TensorShape({4}));
-		  a.vec<float>()(0) = data->my_en.e_vdW;
-		  a.vec<float>()(1) = data->my_en.e_ele;
-		  a.vec<float>()(2) = CEvd;
-		  a.vec<float>()(3) = CEclmb;
-		  
-
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
 			{ "a", a },
 		  };
+		  std::vector<tensorflow::Tensor> outputs;
+		  // Run the session, evaluating our "c" operation from the graph
+		  status = session->Run(inputs, {"c"}, {}, &outputs);
+		  if (!status.ok()) {
+			std::cout << status.ToString() << "\n";
+			return 1;
+		  }
+		
+		  data->my_en.e_vdW = outputs[0].scalar<float>();
+		  data->my_en.e_ele = outputs[1].scalar<float>();
+		  CEvd = outputs[2].scalar<float>();
+		  CEclmb = outputs[3].scalar<float>();
 		  
-		  
+		  // Free any resources used by the session
+		  session->Close();
+		  return 0;
           gettimeofday( &end_bp8, NULL );
           bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 		  
