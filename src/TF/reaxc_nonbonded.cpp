@@ -139,15 +139,15 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  };
 		  std::vector<tensorflow::Tensor> outputs;
 		  // Run the session, evaluating our "c" operation from the graph
-		  status = session->Run(inputs, {"c"}, {}, &outputs);
+		  status = session->Run(inputs, {"predict"}, {}, &outputs);
 		  if (!status.ok()) {
 			std::cout << status.ToString() << "\n";
 		  }
 		
-		  data->my_en.e_vdW = tf.to_double(outputs[0],name='ToDouble');
-		  data->my_en.e_ele = tf.to_double(outputs[1],name='ToDouble');
-		  CEvd = tf.to_double(outputs[2],name='ToDouble');
-		  CEclmb = tf.to_double(outputs[3],name='ToDouble');
+		  data->my_en.e_vdW = outputs[0].scalar<float>();
+		  data->my_en.e_ele = outputs[1].scalar<float>();
+		  CEvd = outputs[2].scalar<float>();
+		  CEclmb = outputs[3].scalar<float>();
 		  
 		  // Free any resources used by the session
 		  session->Close();
