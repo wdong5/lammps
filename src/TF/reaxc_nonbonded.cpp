@@ -158,7 +158,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  CEvd = 0; //outputs[2].scalar<double>();
 		  CEclmb = 0; //outputs[3].scalar<double>();
 		  std::cout<< "tensor type: " <<"\t";
-		  std::cout<<tpyeid(outputs[0].scalar<double>()).name()<<"\n";
+		  std::cout<<typeid(outputs[0].scalar<double>()).name()<<"\n";
 		  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
 		  std::cout<<typeid(CEvd).name()<<"\n";
 		  
