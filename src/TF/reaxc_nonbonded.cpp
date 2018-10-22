@@ -30,7 +30,7 @@
 #include <sys/time.h>
 
 #include <type_traits>
-#include <typeinfo.h>
+#include <typeinfo>
 #ifndef _MSC_VER
 #   include <cxxabi.h>
 #endif
