@@ -135,7 +135,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  a.vec<float>()(5) = twbp->lgcij;
 		  a.vec<float>()(6) = twbp->gamma_w;
 		  
-		  Tensor b(DT_FLOAT, TensorShape(4));
+		  Tensor b(DT_FLOAT, TensorShape({4}));
 		  a.vec<float>()(0) = data->my_en.e_vdW;
 		  a.vec<float>()(1) = data->my_en.e_ele;
 		  a.vec<float>()(2) = CEvd;
