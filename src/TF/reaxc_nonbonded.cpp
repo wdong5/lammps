@@ -144,10 +144,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout << status.ToString() << "\n";
 		  }
 		
-		  data->my_en.e_vdW = outputs[0].scalar<double>();
-		  data->my_en.e_ele = outputs[1].scalar<double>();
-		  CEvd = outputs[2].scalar<double>();
-		  CEclmb = outputs[3].scalar<double>();
+		  data->my_en.e_vdW = 0 ; //= outputs[0].scalar<double>();
+		  data->my_en.e_ele =0 ; //= outputs[1].scalar<double>();
+		  CEvd = 0; //outputs[2].scalar<double>();
+		  CEclmb = 0; //outputs[3].scalar<double>();
+		  std:cout<< "tensor type: " <<tpyeid(outputs[0].scalar<double>()).name()
+					<<typeid(data->my_en.e_vdW).name()
+					<<typeid(CEvd).name()<<endl;
 		  
 		  // Free any resources used by the session
 		  session->Close();
