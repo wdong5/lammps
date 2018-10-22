@@ -126,18 +126,21 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
-		  Tensor a(DT_FLOAT, TensorShape({1,9}));
+		  Tensor a(DT_FLOAT, TensorShape({1,7}));
 		  a.scalar<float>()(0) = nbr_pj->d;
-		  a.scalar<float>()(1) = twbp->gamma
-		  a.scalar<float>()(2) = twbp->D
-		  a.scalar<float>()(3) = twbp->alpha
-		  a.scalar<float>()(4) = twbp->r_vdW
-		  a.scalar<float>()(5) = twbp->lgcij
-		  a.scalar<float>()(6) = twbp->gamma_w
+		  a.scalar<float>()(1) = twbp->gamma;
+		  a.scalar<float>()(2) = twbp->D;
+		  a.scalar<float>()(3) = twbp->alpha;
+		  a.scalar<float>()(4) = twbp->r_vdW;
+		  a.scalar<float>()(5) = twbp->lgcij;
+		  a.scalar<float>()(6) = twbp->gamma_w;
+		  
+		  
 
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
 			{ "a", a },
 		  };
+		  
 		  
           gettimeofday( &end_bp8, NULL );
           bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
