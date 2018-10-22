@@ -29,6 +29,15 @@
 #include <time.h>
 #include <sys/time.h>
 
+#include <type_traits>
+#include <typeinfo>
+#ifndef _MSC_VER
+#   include <cxxabi.h>
+#endif
+#include <memory>
+#include <string>
+#include <cstdlib>
+
 #include "pair_reaxc.h"
 #include "reaxc_types.h"
 #include "reaxc_nonbonded.h"
