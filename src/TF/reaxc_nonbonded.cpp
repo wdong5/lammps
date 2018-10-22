@@ -127,14 +127,19 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             std::cout << status.ToString() << "\n";
           }
 		  Tensor a(DT_FLOAT, TensorShape({1,7}));
-		  a.scalar<float>()(0) = nbr_pj->d;
-		  a.scalar<float>()(1) = twbp->gamma;
-		  a.scalar<float>()(2) = twbp->D;
-		  a.scalar<float>()(3) = twbp->alpha;
-		  a.scalar<float>()(4) = twbp->r_vdW;
-		  a.scalar<float>()(5) = twbp->lgcij;
-		  a.scalar<float>()(6) = twbp->gamma_w;
+		  a.scalar<float>(0)(0) = nbr_pj->d;
+		  a.scalar<float>(0)(1) = twbp->gamma;
+		  a.scalar<float>(0)(2) = twbp->D;
+		  a.scalar<float>(0)(3) = twbp->alpha;
+		  a.scalar<float>(0)(4) = twbp->r_vdW;
+		  a.scalar<float>(0)(5) = twbp->lgcij;
+		  a.scalar<float>(0)(6) = twbp->gamma_w;
 		  
+		  Tensor b(DT_FLOAT, TensorShape({1,4}));
+		  a.scalar<float>(0)(0) = data->my_en.e_vdW;
+		  a.scalar<float>(0)(1) = data->my_en.e_ele;
+		  a.scalar<float>(0)(2) = Cevd;
+		  a.scalar<float>(0)(3) = CEclmb;
 		  
 
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
