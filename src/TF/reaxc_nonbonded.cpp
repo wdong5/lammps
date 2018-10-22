@@ -61,36 +61,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   two_body_parameters *twbp;
   far_neighbor_data *nbr_pj;
   reax_list *far_nbrs;
-
+ 
   
-  
-  
-  //construct a ML graph;
-   tensorflow::Session* session;
-  tensorflow::Status status = NewSession(SessionOptions(), &session);
-  if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
-  }else{
-   // std::cout << "Session successfully created.\n";
-  }
-  // Read in the protobuf graph we exported
-  // (The path seems to be relative to the cwd. Keep this in mind
-  // when using `bazel run` since the cwd isn't where you call
-  // `bazel run` but from inside a temp folder.)
-  GraphDef graph_def;
-  status = tensorflow::ReadBinaryProto(Env::Default(), "./graph.pb", &graph_def);
-  if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
-  }
- gettimeofday( &start_bp8, NULL );
- // Add the graph to the session
-  status = session->Create(graph_def);
-  if (!status.ok()) {
-    std::cout << status.ToString() << "\n";
-  }
- gettimeofday( &end_bp8, NULL );
- bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec; 
-  
+  int mlflag = 1;// use a ml model when flag =1 and continue original code when flag = 0;
+ 
   
   // Tallying variables:
   double pe_vdw, f_tmp, delij[3];
@@ -130,7 +104,32 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       }
 
       if (flag) {
-
+        gettimeofday( &start_bp8, NULL );
+        if (mlflag == 1){
+          //construct a ML graph;
+          tensorflow::Session* session;
+          tensorflow::Status status = NewSession(SessionOptions(), &session);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+          // Read in the protobuf graph we exported
+          // (The path seems to be relative to the cwd. Keep this in mind
+          // when using `bazel run` since the cwd isn't where you call
+          // `bazel run` but from inside a temp folder.)
+          GraphDef graph_def;
+          status = tensorflow::ReadBinaryProto(Env::Default(), "./graph.pb", &graph_def);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+         // Add the graph to the session
+          status = session->Create(graph_def);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+       }
+      gettimeofday( &end_bp8, NULL );
+      bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;   
+     
       r_ij = nbr_pj->d;
       twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
                                        [ system->my_atoms[j].type ]);
@@ -149,6 +148,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       dTap = dTap * r_ij + 3*workspace->Tap[3];
       dTap = dTap * r_ij + 2*workspace->Tap[2];
       dTap += workspace->Tap[1]/r_ij;
+      
+      
 
       /*vdWaals Calculations*/
       if(system->reax_param.gp.vdw_type==1 || system->reax_param.gp.vdw_type==3)
