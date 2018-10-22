@@ -138,7 +138,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  Tensor b(DT_FLOAT, TensorShape({1,4}));
 		  a.scalar<float>(0)(0) = data->my_en.e_vdW;
 		  a.scalar<float>(0)(1) = data->my_en.e_ele;
-		  a.scalar<float>(0)(2) = Cevd;
+		  a.scalar<float>(0)(2) = CEvd;
 		  a.scalar<float>(0)(3) = CEclmb;
 		  
 
