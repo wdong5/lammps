@@ -28,7 +28,6 @@
 #include <iostream>
 #include <time.h>
 #include <sys/time.h>
-#include <tensor.h>
 
 #include <type_traits>
 #include <typeinfo>
@@ -147,8 +146,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           }
 	  std::cout<<"created graph\n";
 
-		Tensor a(DT_FLOAT, TensorShape({1, 7}));
-		  std::cout<<"check point 1"<<endl;
+		tensorflow::Tensor a(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 7}));
+		std::cout<<"created a\n";
 		  a.matrix<float>()(0,0) = nbr_pj->d;
 		  a.matrix<float>()(0,1) = twbp->gamma;
 		  a.matrix<float>()(0,2) = twbp->D;
