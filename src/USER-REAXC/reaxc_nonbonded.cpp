@@ -151,7 +151,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             std::cout << status.ToString() << "\n";
           }
 		  std::cout<<"created graph\n";
-		  Tensor a(DT_FLOAT, TensorShape());
+		  tensorflow::Tensor a(tensorflow::DT_FLOAT, tensorflow::TensorShape());
 		  a.scalar<float>()() = 3.0;
 		  std::cout<<"created a!\n";
 		  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
