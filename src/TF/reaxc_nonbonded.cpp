@@ -239,10 +239,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                 CEvd += dTap * e_lg + Tap * de_lg / r_ij;
               }
 
-		  std::cout<< "tensor type: " <<"\t";
-		  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
-		  std::cout<<typeid(CEvd).name()<<"\n";
-            }
+	  }
 
           /*Coulomb Calculations*/
           dr3gamij_1 = ( r_ij * r_ij * r_ij + twbp->gamma );
@@ -254,6 +251,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
+		
+	  std::cout<< "tensor type: " <<"\t";
+	  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
+	  std::cout<<typeid(CEvd).name()<<"\n";
 
         }
 
