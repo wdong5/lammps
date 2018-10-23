@@ -25,6 +25,11 @@
   ----------------------------------------------------------------------*/
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
+#include "tensorflow/core/framework/unique_tensor_references.h"
+
+#include "tensorflow/core/lib/core/status.h"
+#include "tensorflow/core/platform/test.h"
+
 #include <iostream>
 #include <time.h>
 #include <sys/time.h>
