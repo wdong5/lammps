@@ -112,8 +112,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
         }
       }
 
+
+      std::cout<<"before flag\n";
+	    
       if (flag) {
         if (mlflag == 1){
+          std::cout<<"after mlflag\n";
+
           gettimeofday( &start_bp8, NULL );
           //construct a ML graph;
           tensorflow::Session* session;
@@ -121,6 +126,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
+      	  std::cout<<"session created \n";
+
           // Read in the protobuf graph we exported
           // (The path seems to be relative to the cwd. Keep this in mind
           // when using `bazel run` since the cwd isn't where you call
