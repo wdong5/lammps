@@ -25,6 +25,7 @@
   ----------------------------------------------------------------------*/
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
+#include "tensorflow/core/public/tensor.h"
 #include "tensorflow/core/framework/unique_tensor_references.h"
 
 #include "tensorflow/core/lib/core/status.h"
@@ -149,21 +150,22 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
-	  std::cout<<"created graph\n";
-	  Tensor a(DT_FLOAT, TensorShape());
-	  a.scalar<float>()() = 3.0;
-	  std::cout<<"created a!\n";
-		tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
-		std::cout<<"created input_tensor\n";
-		auto input_tensor_mapped = input_tensor.tensor<float, 4>();
+		  std::cout<<"created graph\n";
+		  Tensor a(DT_FLOAT, TensorShape());
+		  a.scalar<float>()() = 3.0;
+		  std::cout<<"created a!\n";
+		  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+		  std::cout<<"created input_tensor\n";
+		  auto input_tensor_mapped = input_tensor.tensor<float, 7>();
 		
-		  input_tensor.matrix<float>()(0,0) = nbr_pj->d;
-		  input_tensor.matrix<float>()(0,1) = twbp->gamma;
-		  input_tensor.matrix<float>()(0,2) = twbp->D;
-		  input_tensor.matrix<float>()(0,3) = twbp->alpha;
-		  input_tensor.matrix<float>()(0,4) = twbp->r_vdW;
-		  input_tensor.matrix<float>()(0,5) = twbp->lgcij;
-		  input_tensor.matrix<float>()(0,6) = twbp->gamma_w;
+		  input_tensor_mapped(0,0) = nbr_pj->d;
+		  input_tensor_mapped(0,1) = twbp->gamma;
+		  input_tensor_mapped(0,2) = twbp->D;
+		  input_tensor_mapped(0,3) = twbp->alpha;
+		  input_tensor_mapped(0,4) = twbp->r_vdW;
+		  input_tensor_mapped(0,5) = twbp->lgcij;
+		  input_tensor_mapped((0,6) = twbp->gamma_w;
+		  //input_tensor.matrix<float>()(0,6) = twbp->gamma_w;
 		  std::cout<<"check point"<<endl;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 		  std::cout<<"give values for input_tensor!"<<endl;
