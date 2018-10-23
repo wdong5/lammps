@@ -137,11 +137,15 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
+          std::cout<<"graph.pb loaded\n";
+
          // Add the graph to the session
           status = session->Create(graph_def);
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
+	  std::cout<<"created graph\n";
+
 		Tensor a(DT_FLOAT, TensorShape({7}));
 		  a.vec<float>()(0) = nbr_pj->d;
 		  a.vec<float>()(1) = twbp->gamma;
@@ -159,7 +163,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  if (!status.ok()) {
 			std::cout << status.ToString() << "\n";
 		  }
-		
+	      	  std::cout<<"run model on input\n";
+
 		  data->my_en.e_vdW = 0 ; //= outputs[0].scalar<double>();
 		  data->my_en.e_ele =0 ; //= outputs[1].scalar<double>();
 		  CEvd = 0; //outputs[2].scalar<double>();
@@ -170,7 +175,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<typeid(CEvd).name()<<"\n";
 		  
 		  // Free any resources used by the session
-		  session->Close();
+		  session->Close(); 
+		  std::cout<<"session closed \n";
+
           gettimeofday( &end_bp8, NULL );
           bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 		  
