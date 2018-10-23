@@ -147,30 +147,30 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	  std::cout<<"created graph\n";
 
 		Tensor a(DT_FLOAT, TensorShape({1, 7}));
-		  a.vec<float>()(0,0) = nbr_pj->d;
-		  a.vec<float>()(0,1) = twbp->gamma;
-		  a.vec<float>()(0,2) = twbp->D;
-		  a.vec<float>()(0,3) = twbp->alpha;
-		  a.vec<float>()(0,4) = twbp->r_vdW;
-		  a.vec<float>()(0,5) = twbp->lgcij;
-		  a.vec<float>()(0,6) = twbp->gamma_w;
+		  a.matrix<float>()(0,0) = nbr_pj->d;
+		  a.matrix<float>()(0,1) = twbp->gamma;
+		  a.matrix<float>()(0,2) = twbp->D;
+		  a.matrix<float>()(0,3) = twbp->alpha;
+		  a.matrix<float>()(0,4) = twbp->r_vdW;
+		  a.matrix<float>()(0,5) = twbp->lgcij;
+		  a.matrix<float>()(0,6) = twbp->gamma_w;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
-			{ "x_train_batch", a },
+			{ "input", a },
 		  };
 		  std::vector<tensorflow::Tensor> outputs;
 		  // Run the session, evaluating our "c" operation from the graph
-		  status = session->Run(inputs, {"predict"}, {}, &outputs);
+		  status = session->Run(inputs, {"output"}, {}, &outputs);
 		  if (!status.ok()) {
 			std::cout << status.ToString() << "\n";
 		  }
 	      	  std::cout<<"run model on input\n";
 
-		  data->my_en.e_vdW = 0; //outputs.vec<double>()(0,0) ; //= outputs[0].scalar<double>();
+		  data->my_en.e_vdW = 0; //double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
 		  data->my_en.e_ele = 0;//outputs.vec<double>(0,1) ; //= outputs[1].scalar<double>();
 		  CEvd = 0; //outputs[2].scalar<double>();
 		  CEclmb = 0; //outputs[3].scalar<double>();
 		  std::cout<< "tensor type: " <<"\t";
-		  std::cout<<typeid(outputs[0].scalar<double>()).name()<<"\n";
+		  std::cout<<typeid(outputs[0].scalar<float>()).name()<<"\n";
 		  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
 		  std::cout<<typeid(CEvd).name()<<"\n";
 		  
