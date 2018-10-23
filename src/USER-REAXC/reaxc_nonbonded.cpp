@@ -28,6 +28,7 @@
 #include <iostream>
 #include <time.h>
 #include <sys/time.h>
+#include <tensor.h>
 
 #include <type_traits>
 #include <typeinfo>
