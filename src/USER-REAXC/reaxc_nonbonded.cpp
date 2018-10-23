@@ -23,6 +23,20 @@
   See the GNU General Public License for more details:
   <http://www.gnu.org/licenses/>.
   ----------------------------------------------------------------------*/
+#include <tensorflow/core/platform/env.h>
+#include <tensorflow/core/public/session.h>
+#include <iostream>
+#include <time.h>
+#include <sys/time.h>
+
+#include <type_traits>
+#include <typeinfo>
+#ifndef _MSC_VER
+#   include <cxxabi.h>
+#endif
+#include <memory>
+#include <string>
+#include <cstdlib>
 
 #include "pair_reaxc.h"
 #include "reaxc_types.h"
@@ -30,6 +44,13 @@
 #include "reaxc_bond_orders.h"
 #include "reaxc_list.h"
 #include "reaxc_vector.h"
+
+using namespace std;
+using namespace LAMMPS_NS;
+using namespace tensorflow;
+
+extern struct timeval start_bp8, end_bp8;
+extern double bp8;
 
 void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                          simulation_data *data, storage *workspace,
@@ -49,7 +70,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   two_body_parameters *twbp;
   far_neighbor_data *nbr_pj;
   reax_list *far_nbrs;
-
+ 
+  
+  int mlflag = 1;// use a ml model when flag =1 and continue original code when flag = 0;
+ 
+  
   // Tallying variables:
   double pe_vdw, f_tmp, delij[3];
 
@@ -87,89 +112,168 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
         }
       }
 
+
+      std::cout<<"before flag\n";
+	    
       if (flag) {
+        if (mlflag == 1){
+          std::cout<<"after mlflag\n";
 
-      r_ij = nbr_pj->d;
-      twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
-                                       [ system->my_atoms[j].type ]);
+          gettimeofday( &start_bp8, NULL );
+          //construct a ML graph;
+          tensorflow::Session* session;
+          tensorflow::Status status = NewSession(SessionOptions(), &session);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+      	  std::cout<<"session created \n";
 
-      Tap = workspace->Tap[7] * r_ij + workspace->Tap[6];
-      Tap = Tap * r_ij + workspace->Tap[5];
-      Tap = Tap * r_ij + workspace->Tap[4];
-      Tap = Tap * r_ij + workspace->Tap[3];
-      Tap = Tap * r_ij + workspace->Tap[2];
-      Tap = Tap * r_ij + workspace->Tap[1];
-      Tap = Tap * r_ij + workspace->Tap[0];
+          // Read in the protobuf graph we exported
+          // (The path seems to be relative to the cwd. Keep this in mind
+          // when using `bazel run` since the cwd isn't where you call
+          // `bazel run` but from inside a temp folder.)
+          GraphDef graph_def;
+          status = tensorflow::ReadBinaryProto(Env::Default(), "./graph.pb", &graph_def);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+          std::cout<<"graph.pb loaded\n";
 
-      dTap = 7*workspace->Tap[7] * r_ij + 6*workspace->Tap[6];
-      dTap = dTap * r_ij + 5*workspace->Tap[5];
-      dTap = dTap * r_ij + 4*workspace->Tap[4];
-      dTap = dTap * r_ij + 3*workspace->Tap[3];
-      dTap = dTap * r_ij + 2*workspace->Tap[2];
-      dTap += workspace->Tap[1]/r_ij;
+         // Add the graph to the session
+          status = session->Create(graph_def);
+          if (!status.ok()) {
+            std::cout << status.ToString() << "\n";
+          }
+	  std::cout<<"created graph\n";
 
-      /*vdWaals Calculations*/
-      if(system->reax_param.gp.vdw_type==1 || system->reax_param.gp.vdw_type==3)
-        { // shielding
-          powr_vdW1 = pow(r_ij, p_vdW1);
-          powgi_vdW1 = pow( 1.0 / twbp->gamma_w, p_vdW1);
+		Tensor a(DT_FLOAT, TensorShape({1, 7}));
+		  a.matrix<float>()(0,0) = nbr_pj->d;
+		  a.matrix<float>()(0,1) = twbp->gamma;
+		  a.matrix<float>()(0,2) = twbp->D;
+		  a.matrix<float>()(0,3) = twbp->alpha;
+		  a.matrix<float>()(0,4) = twbp->r_vdW;
+		  a.matrix<float>()(0,5) = twbp->lgcij;
+		  a.matrix<float>()(0,6) = twbp->gamma_w;
+		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
+			{ "input", a },
+		  };
+		  std::cout<<"give values for a!"<<endl;
+		  std::vector<tensorflow::Tensor> outputs;
+		  // Run the session, evaluating our "c" operation from the graph
+		  status = session->Run(inputs, {"output"}, {}, &outputs);
+		  if (!status.ok()) {
+			std::cout << status.ToString() << "\n";
+		  }
+	      	  std::cout<<"run model on input\n";
 
-          fn13 = pow( powr_vdW1 + powgi_vdW1, p_vdW1i );
-          exp1 = exp( twbp->alpha * (1.0 - fn13 / twbp->r_vdW) );
-          exp2 = exp( 0.5 * twbp->alpha * (1.0 - fn13 / twbp->r_vdW) );
+		  data->my_en.e_vdW = double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
+		  data->my_en.e_ele = double(outputs[0].matrix<float>()(0,1)) ; //= outputs[1].scalar<double>();
+		  CEvd =              double(outputs[0].matrix<float>()(0,2)) ;
+		  CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;
+		  std::cout<< "tensor type: " <<"\t";
+		  std::cout<<typeid(outputs[0].matrix<float>()(0, 0)).name()<<"\n";
+		  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
+		  std::cout<<typeid(CEvd).name()<<"\n";
+		  
+		  // Free any resources used by the session
+		  session->Close(); 
+		  std::cout<<"session closed \n";
 
-          e_vdW = twbp->D * (exp1 - 2.0 * exp2);
-          data->my_en.e_vdW += Tap * e_vdW;
+          gettimeofday( &end_bp8, NULL );
+          bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+		  
+       }else{
+          r_ij = nbr_pj->d;
+          twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
+                                           [ system->my_atoms[j].type ]);
 
-          dfn13 = pow( powr_vdW1 + powgi_vdW1, p_vdW1i - 1.0) *
-            pow(r_ij, p_vdW1 - 2.0);
+          Tap = workspace->Tap[7] * r_ij + workspace->Tap[6];
+          Tap = Tap * r_ij + workspace->Tap[5];
+          Tap = Tap * r_ij + workspace->Tap[4];
+          Tap = Tap * r_ij + workspace->Tap[3];
+          Tap = Tap * r_ij + workspace->Tap[2];
+          Tap = Tap * r_ij + workspace->Tap[1];
+          Tap = Tap * r_ij + workspace->Tap[0];
 
-          CEvd = dTap * e_vdW -
-            Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) * dfn13;
-        }
-      else{ // no shielding
-        exp1 = exp( twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
-        exp2 = exp( 0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
+          dTap = 7*workspace->Tap[7] * r_ij + 6*workspace->Tap[6];
+          dTap = dTap * r_ij + 5*workspace->Tap[5];
+          dTap = dTap * r_ij + 4*workspace->Tap[4];
+          dTap = dTap * r_ij + 3*workspace->Tap[3];
+          dTap = dTap * r_ij + 2*workspace->Tap[2];
+          dTap += workspace->Tap[1]/r_ij;
 
-        e_vdW = twbp->D * (exp1 - 2.0 * exp2);
-        data->my_en.e_vdW += Tap * e_vdW;
 
-        CEvd = dTap * e_vdW -
-          Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) / r_ij;
-      }
 
-      if(system->reax_param.gp.vdw_type==2 || system->reax_param.gp.vdw_type==3)
-        { // inner wall
-          e_core = twbp->ecore * exp(twbp->acore * (1.0-(r_ij/twbp->rcore)));
-          data->my_en.e_vdW += Tap * e_core;
+          /*vdWaals Calculations*/
+          if(system->reax_param.gp.vdw_type==1 || system->reax_param.gp.vdw_type==3)
+            { // shielding
+              powr_vdW1 = pow(r_ij, p_vdW1);
+              powgi_vdW1 = pow( 1.0 / twbp->gamma_w, p_vdW1);
 
-          de_core = -(twbp->acore/twbp->rcore) * e_core;
-          CEvd += dTap * e_core + Tap * de_core / r_ij;
+              fn13 = pow( powr_vdW1 + powgi_vdW1, p_vdW1i );
+              exp1 = exp( twbp->alpha * (1.0 - fn13 / twbp->r_vdW) );
+              exp2 = exp( 0.5 * twbp->alpha * (1.0 - fn13 / twbp->r_vdW) );
 
-          //  lg correction, only if lgvdw is yes
-          if (control->lgflag) {
-            r_ij5 = pow( r_ij, 5.0 );
-            r_ij6 = pow( r_ij, 6.0 );
-            re6 = pow( twbp->lgre, 6.0 );
-            e_lg = -(twbp->lgcij/( r_ij6 + re6 ));
-            data->my_en.e_vdW += Tap * e_lg;
+              e_vdW = twbp->D * (exp1 - 2.0 * exp2);
+              data->my_en.e_vdW += Tap * e_vdW;
 
-            de_lg = -6.0 * e_lg *  r_ij5 / ( r_ij6 + re6 ) ;
-            CEvd += dTap * e_lg + Tap * de_lg / r_ij;
+              dfn13 = pow( powr_vdW1 + powgi_vdW1, p_vdW1i - 1.0) *
+                pow(r_ij, p_vdW1 - 2.0);
+
+              CEvd = dTap * e_vdW -
+                Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) * dfn13;
+            }
+          else{ // no shielding
+            exp1 = exp( twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
+            exp2 = exp( 0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
+
+            e_vdW = twbp->D * (exp1 - 2.0 * exp2);
+            data->my_en.e_vdW += Tap * e_vdW;
+
+            CEvd = dTap * e_vdW -
+              Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) / r_ij;
           }
 
+          if(system->reax_param.gp.vdw_type==2 || system->reax_param.gp.vdw_type==3)
+            { // inner wall
+              e_core = twbp->ecore * exp(twbp->acore * (1.0-(r_ij/twbp->rcore)));
+              data->my_en.e_vdW += Tap * e_core;
+
+              de_core = -(twbp->acore/twbp->rcore) * e_core;
+              CEvd += dTap * e_core + Tap * de_core / r_ij;
+
+              //  lg correction, only if lgvdw is yes
+              if (control->lgflag) {
+                r_ij5 = pow( r_ij, 5.0 );
+                r_ij6 = pow( r_ij, 6.0 );
+                re6 = pow( twbp->lgre, 6.0 );
+                e_lg = -(twbp->lgcij/( r_ij6 + re6 ));
+                data->my_en.e_vdW += Tap * e_lg;
+
+                de_lg = -6.0 * e_lg *  r_ij5 / ( r_ij6 + re6 ) ;
+                CEvd += dTap * e_lg + Tap * de_lg / r_ij;
+              }
+
+	  }
+
+          /*Coulomb Calculations*/
+          dr3gamij_1 = ( r_ij * r_ij * r_ij + twbp->gamma );
+          dr3gamij_3 = pow( dr3gamij_1 , 0.33333333333333 );
+
+          tmp = Tap / dr3gamij_3;
+          data->my_en.e_ele += e_ele =
+            C_ele * system->my_atoms[i].q * system->my_atoms[j].q * tmp;
+
+          CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
+            ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
+		
+	  std::cout<< "tensor type: " <<"\t";
+	  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
+	  std::cout<<typeid(CEvd).name()<<"\n";
+
         }
 
-      /*Coulomb Calculations*/
-      dr3gamij_1 = ( r_ij * r_ij * r_ij + twbp->gamma );
-      dr3gamij_3 = pow( dr3gamij_1 , 0.33333333333333 );
-
-      tmp = Tap / dr3gamij_3;
-      data->my_en.e_ele += e_ele =
-        C_ele * system->my_atoms[i].q * system->my_atoms[j].q * tmp;
-
-      CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
-        ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
+     
 
       /* tally into per-atom energy */
       if( system->pair_ptr->evflag || system->pair_ptr->vflag_atom) {
