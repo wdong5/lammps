@@ -165,8 +165,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  }
 	      	  std::cout<<"run model on input\n";
 
-		  data->my_en.e_vdW = outputs.vec<double>()(0,0) ; //= outputs[0].scalar<double>();
-		  data->my_en.e_ele = outputs.vec<double>(0,1) ; //= outputs[1].scalar<double>();
+		  data->my_en.e_vdW = 0; //outputs.vec<double>()(0,0) ; //= outputs[0].scalar<double>();
+		  data->my_en.e_ele = 0;//outputs.vec<double>(0,1) ; //= outputs[1].scalar<double>();
 		  CEvd = 0; //outputs[2].scalar<double>();
 		  CEclmb = 0; //outputs[3].scalar<double>();
 		  std::cout<< "tensor type: " <<"\t";
