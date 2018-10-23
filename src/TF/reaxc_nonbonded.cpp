@@ -155,7 +155,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  a.vec<float>()(0,5) = twbp->lgcij;
 		  a.vec<float>()(0,6) = twbp->gamma_w;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
-			{ "a", a },
+			{ "x_train_batch", a },
 		  };
 		  std::vector<tensorflow::Tensor> outputs;
 		  // Run the session, evaluating our "c" operation from the graph
