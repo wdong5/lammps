@@ -151,18 +151,18 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           }
 	  std::cout<<"created graph\n";
 
-		tensorflow::Tensor a(tensorflow::DT_FLOAT, tensorflow::TensorShape({1, 7}));
-		std::cout<<"created a\n";
-		  a.matrix<float>()(0,0) = nbr_pj->d;
-		  a.matrix<float>()(0,1) = twbp->gamma;
-		  a.matrix<float>()(0,2) = twbp->D;
-		  a.matrix<float>()(0,3) = twbp->alpha;
-		  a.matrix<float>()(0,4) = twbp->r_vdW;
-		  a.matrix<float>()(0,5) = twbp->lgcij;
-		  a.matrix<float>()(0,6) = twbp->gamma_w;
+		tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+		std::cout<<"created input_tensor\n";
+		  input_tensor.matrix<float>()(0,0) = nbr_pj->d;
+		  input_tensor.matrix<float>()(0,1) = twbp->gamma;
+		  input_tensor.matrix<float>()(0,2) = twbp->D;
+		  input_tensor.matrix<float>()(0,3) = twbp->alpha;
+		  input_tensor.matrix<float>()(0,4) = twbp->r_vdW;
+		  input_tensor.matrix<float>()(0,5) = twbp->lgcij;
+		  input_tensor.matrix<float>()(0,6) = twbp->gamma_w;
 		  std::cout<<"check point"<<endl;
-		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", a }};
-		  std::cout<<"give values for a!"<<endl;
+		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
+		  std::cout<<"give values for input_tensor!"<<endl;
 		  std::vector<tensorflow::Tensor> outputs;
 		  // Run the session, evaluating our "c" operation from the graph
 		  status = session->Run(inputs, {"output"}, {}, &outputs);
