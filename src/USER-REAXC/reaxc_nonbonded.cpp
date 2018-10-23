@@ -150,9 +150,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             std::cout << status.ToString() << "\n";
           }
 	  std::cout<<"created graph\n";
-
+	  Tensor a(DT_FLOAT, TensorShape());
+	  a.scalar<float>()() = 3.0;
+	  std::cout<<"created a!\n";
 		tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
 		std::cout<<"created input_tensor\n";
+		auto input_tensor_mapped = input_tensor.tensor<float, 4>();
+		
 		  input_tensor.matrix<float>()(0,0) = nbr_pj->d;
 		  input_tensor.matrix<float>()(0,1) = twbp->gamma;
 		  input_tensor.matrix<float>()(0,2) = twbp->D;
