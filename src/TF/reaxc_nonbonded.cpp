@@ -26,7 +26,7 @@
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
 #include <tensorflow/core/framework/tensor.h>
-#include <tensor.h>
+
 //#include "tensorflow/core/framework/unique_tensor_references.h"
 
 //#include "tensorflow/core/lib/core/status.h"
