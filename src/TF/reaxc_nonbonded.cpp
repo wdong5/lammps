@@ -25,7 +25,7 @@
   ----------------------------------------------------------------------*/
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
-
+#include <tensorflow/core/framework/tensor.h>
 //#include "tensorflow/core/framework/unique_tensor_references.h"
 
 //#include "tensorflow/core/lib/core/status.h"
@@ -158,13 +158,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<"created input_tensor\n";
 		  auto input_tensor_mapped = input_tensor.tensor<float, 2>();
 		  std::cout<<"created input_tensor_map\n";
-		  input_tensor_mapped(0,0) = static_cast<float>(nbr_pj->d);
-		  input_tensor_mapped(0,1) = static_cast<float>(twbp->gamma);
-		  input_tensor_mapped(0,2) = static_cast<float>(twbp->D);
-		  input_tensor_mapped(0,3) = static_cast<float>(twbp->alpha);
-		  input_tensor_mapped(0,4) = static_cast<float>(twbp->r_vdW);
-		  input_tensor_mapped(0,5) = static_cast<float>(twbp->lgcij);
-		  input_tensor_mapped(0,6) = static_cast<float>(twbp->gamma_w);
+		  input_tensor_mapped(0,0) = nbr_pj->d;
+		  input_tensor_mapped(0,1) = twbp->gamma;
+		  input_tensor_mapped(0,2) = twbp->D;
+		  input_tensor_mapped(0,3) = twbp->alpha;
+		  input_tensor_mapped(0,4) = twbp->r_vdW;
+		  input_tensor_mapped(0,5) = twbp->lgcij;
+		  input_tensor_mapped(0,6) = twbp->gamma_w;
 		  /*input_tensor.matrix<float>()(0,0) = static_cast<float>(nbr_pj->d);
 		  input_tensor.matrix<float>()(0,1) = static_cast<float>(twbp->gamma);
 		  input_tensor.matrix<float>()(0,2) = static_cast<float>(twbp->D);
