@@ -54,7 +54,7 @@
 using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
-
+is te a;
 extern struct timeval start_bp8, end_bp8;
 extern double bp8;
 
