@@ -54,7 +54,7 @@
 using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
-is te a;
+
 extern struct timeval start_bp8, end_bp8;
 extern double bp8;
 
@@ -144,7 +144,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             std::cout << status.ToString() << "\n";
           }
           std::cout<<"graph.pb loaded\n";
-
+ 	  std::cout<<"let us continue!\n";
          // Add the graph to the session
           status = session->Create(graph_def);
           if (!status.ok()) {
