@@ -164,7 +164,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  input_tensor_mapped(0,3) = twbp->alpha;
 		  input_tensor_mapped(0,4) = twbp->r_vdW;
 		  input_tensor_mapped(0,5) = twbp->lgcij;
-		  input_tensor_mapped((0,6) = twbp->gamma_w;
+		  input_tensor_mapped(0,6) = twbp->gamma_w;
 		  //input_tensor.matrix<float>()(0,6) = twbp->gamma_w;
 		  std::cout<<"check point"<<endl;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
