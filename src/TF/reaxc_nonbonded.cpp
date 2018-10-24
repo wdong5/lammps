@@ -156,7 +156,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<"created a!\n";
 		  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
 		  std::cout<<"created input_tensor\n";
-		  /*auto input_tensor_mapped = input_tensor.tensor<float, 7>();
+		  auto input_tensor_mapped = input_tensor.tensor<float, 7>();
 		
 		  input_tensor_mapped(0,0) = static_cast<float>(nbr_pj->d);
 		  input_tensor_mapped(0,1) = static_cast<float>(twbp->gamma);
@@ -164,14 +164,14 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  input_tensor_mapped(0,3) = static_cast<float>(twbp->alpha);
 		  input_tensor_mapped(0,4) = static_cast<float>(twbp->r_vdW);
 		  input_tensor_mapped(0,5) = static_cast<float>(twbp->lgcij);
-		  input_tensor_mapped(0,6) = static_cast<float>(twbp->gamma_w);*/
-		  input_tensor.matrix<float>()(0,0) = static_cast<float>(nbr_pj->d);
+		  input_tensor_mapped(0,6) = static_cast<float>(twbp->gamma_w);
+		  /*input_tensor.matrix<float>()(0,0) = static_cast<float>(nbr_pj->d);
 		  input_tensor.matrix<float>()(0,1) = static_cast<float>(twbp->gamma);
 		  input_tensor.matrix<float>()(0,2) = static_cast<float>(twbp->D);
 		  input_tensor.matrix<float>()(0,3) = static_cast<float>(twbp->alpha);
 		  input_tensor.matrix<float>()(0,4) = static_cast<float>(twbp->r_vdW);
 		  input_tensor.matrix<float>()(0,5) = static_cast<float>(twbp->lgcij);
-		  input_tensor.matrix<float>()(0,6) = static_cast<float>(twbp->gamma_w);
+		  input_tensor.matrix<float>()(0,6) = static_cast<float>(twbp->gamma_w);*/
 		  std::cout<<"check point"<<endl;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 		  std::cout<<"give values for input_tensor!"<<endl;
