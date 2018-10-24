@@ -159,20 +159,21 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<"created input_tensor\n";
 		  auto input_tensor_mapped = input_tensor.tensor<double, 2>();
 		  std::cout<<"created input_tensor_map\n";
-		  input_tensor_mapped(0,0) = static_cast<float>(nbr_pj->d);
-		  input_tensor_mapped(0,1) = static_cast<float>(twbp->gamma);
-		  input_tensor_mapped(0,2) = static_cast<float>(twbp->D);
-		  input_tensor_mapped(0,3) = static_cast<float>(twbp->alpha);
-		  input_tensor_mapped(0,4) = static_cast<float>(twbp->r_vdW);
-		  input_tensor_mapped(0,5) = static_cast<float>(twbp->lgcij);
-		  input_tensor_mapped(0,6) = static_cast<float>(twbp->gamma_w);
-		  /*input_tensor.matrix<float>()(0,0) = static_cast<float>(nbr_pj->d);
-		  input_tensor.matrix<float>()(0,1) = static_cast<float>(twbp->gamma);
-		  input_tensor.matrix<float>()(0,2) = static_cast<float>(twbp->D);
-		  input_tensor.matrix<float>()(0,3) = static_cast<float>(twbp->alpha);
-		  input_tensor.matrix<float>()(0,4) = static_cast<float>(twbp->r_vdW);
-		  input_tensor.matrix<float>()(0,5) = static_cast<float>(twbp->lgcij);
-		  input_tensor.matrix<float>()(0,6) = static_cast<float>(twbp->gamma_w);*/
+		  input_tensor_mapped(0,0) = nbr_pj->d;
+		  std::cout<< input_tensor_mapped(0,0)<<"\n";
+		  input_tensor_mapped(0,1) = static_cast<double>(twbp->gamma);
+		  input_tensor_mapped(0,2) = static_cast<double>(twbp->D);
+		  input_tensor_mapped(0,3) = static_cast<double>(twbp->alpha);
+		  input_tensor_mapped(0,4) = static_cast<double>(twbp->r_vdW);
+		  input_tensor_mapped(0,5) = static_cast<double>(twbp->lgcij);
+		  input_tensor_mapped(0,6) = static_cast<double>(twbp->gamma_w);
+		  /*input_tensor.matrix<float>()(0,0) = static_cast<double>(nbr_pj->d);
+		  input_tensor.matrix<float>()(0,1) = static_cast<double>(twbp->gamma);
+		  input_tensor.matrix<float>()(0,2) = static_cast<double>(twbp->D);
+		  input_tensor.matrix<float>()(0,3) = static_cast<double>(twbp->alpha);
+		  input_tensor.matrix<float>()(0,4) = static_cast<double>(twbp->r_vdW);
+		  input_tensor.matrix<float>()(0,5) = static_cast<double>(twbp->lgcij);
+		  input_tensor.matrix<float>()(0,6) = static_cast<double>(twbp->gamma_w);*/
 		  std::cout<<"check point"<<endl;
 		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 		  std::cout<<"give values for input_tensor!"<<endl;
