@@ -25,6 +25,12 @@
   ----------------------------------------------------------------------*/
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
+#include "tensorflow/core/public/tensor.h"
+//#include "tensorflow/core/framework/unique_tensor_references.h"
+
+//#include "tensorflow/core/lib/core/status.h"
+//#include "tensorflow/core/platform/test.h"
+
 #include <iostream>
 #include <time.h>
 #include <sys/time.h>
@@ -144,19 +150,25 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
-	  std::cout<<"created graph\n";
-
-		Tensor a(DT_FLOAT, TensorShape({1, 7}));
-		  a.matrix<float>()(0,0) = nbr_pj->d;
-		  a.matrix<float>()(0,1) = twbp->gamma;
-		  a.matrix<float>()(0,2) = twbp->D;
-		  a.matrix<float>()(0,3) = twbp->alpha;
-		  a.matrix<float>()(0,4) = twbp->r_vdW;
-		  a.matrix<float>()(0,5) = twbp->lgcij;
-		  a.matrix<float>()(0,6) = twbp->gamma_w;
-		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {
-			{ "input", a },
-		  };
+		  std::cout<<"created graph\n";
+		  tensorflow::Tensor a(tensorflow::DT_FLOAT, tensorflow::TensorShape());
+		  a.scalar<float>()() = 3.0;
+		  std::cout<<"created a!\n";
+		  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+		  std::cout<<"created input_tensor\n";
+		  auto input_tensor_mapped = input_tensor.tensor<float, 7>();
+		
+		  input_tensor_mapped(0,0) = nbr_pj->d;
+		  input_tensor_mapped(0,1) = twbp->gamma;
+		  input_tensor_mapped(0,2) = twbp->D;
+		  input_tensor_mapped(0,3) = twbp->alpha;
+		  input_tensor_mapped(0,4) = twbp->r_vdW;
+		  input_tensor_mapped(0,5) = twbp->lgcij;
+		  input_tensor_mapped(0,6) = twbp->gamma_w;
+		  //input_tensor.matrix<float>()(0,6) = twbp->gamma_w;
+		  std::cout<<"check point"<<endl;
+		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
+		  std::cout<<"give values for input_tensor!"<<endl;
 		  std::vector<tensorflow::Tensor> outputs;
 		  // Run the session, evaluating our "c" operation from the graph
 		  status = session->Run(inputs, {"output"}, {}, &outputs);
