@@ -161,8 +161,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<"created input_tensor_map\n";
 		  input_tensor_mapped(0,0) = nbr_pj->d;
 		  std::cout<< input_tensor_mapped(0,0)<<"\n";
-		  input_tensor_mapped(0,1) = twbp->gamma;
-		  input_tensor_mapped(0,2) = twbp->D;
+		  input_tensor_mapped(0,1) = static_cast<double>(twbp->gamma);
+		  std::cout<< input_tensor_mapped(0,1)<<"\n";
+		  input_tensor_mapped(0,2) = static_cast<double>(twbp->D);
 		  std::cout<< input_tensor_mapped(0,2)<<"\n";
 		  input_tensor_mapped(0,3) = twbp->alpha;
 		  input_tensor_mapped(0,4) = twbp->r_vdW;
