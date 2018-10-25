@@ -179,7 +179,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout<< input_tensor_mapped(0,6)<<"\n";
 			std::cout<<"check point"<<endl;
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
-
+			std::vector<tensorflow::Tensor> outputs;
+			status = session->Run(inputs, {"output"}, {}, &outputs);
+			td::cout<<"check point2"<<endl;
+			
        }else{
           r_ij = nbr_pj->d;
           twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
