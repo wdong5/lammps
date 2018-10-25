@@ -93,7 +93,38 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_core = 0;
   e_vdW = 0;
   e_lg = de_lg = 0.0;
-
+  //construct a ML graph;
+  const std::string pathToGraph  = "./models/my-model.meta";
+  const std::string checkpointPath  = "./models/my-model";
+  tensorflow::Session* session;
+  tensorflow::Status status = NewSession(SessionOptions(), &session);
+  if (!status.ok()) {
+	std::cout << status.ToString() << "\n";
+  }
+  //std::cout<<"session created \n";
+  
+  MetaGraphDef graph_def;
+  status = ReadBinaryProto(Env::Default(), pathToGraph, &graph_def);
+  if (!status.ok()) {
+	throw runtime_error("Error reading graph definition from " + pathToGraph + ": " + status.ToString());
+  }
+  // Add the graph to the session
+	status = session->Create(graph_def.graph_def());
+	if (!status.ok()) {
+		throw runtime_error("Error creating graph: " + status.ToString());
+	}
+	// Read weights from the saved checkpoint
+	Tensor checkpointPathTensor(DT_STRING, TensorShape());
+	checkpointPathTensor.scalar<std::string>()() = checkpointPath;
+	status = session->Run(
+			{{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
+			{},
+			{graph_def.saver_def().restore_op_name()},
+			nullptr);
+	if (!status.ok()) {
+		throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
+	}
+	tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
   for( i = 0; i < natoms; ++i ) {
     if (system->my_atoms[i].type < 0) continue;
     start_i = Start_Index(i, far_nbrs);
@@ -127,40 +158,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
                                            [ system->my_atoms[j].type ]);
           //std::cout<<"after mlflag\n";
-
-
-          //construct a ML graph;
-		  const std::string pathToGraph  = "./models/my-model.meta";
-		  const std::string checkpointPath  = "./models/my-model";
-          tensorflow::Session* session;
-          tensorflow::Status status = NewSession(SessionOptions(), &session);
-          if (!status.ok()) {
-            std::cout << status.ToString() << "\n";
-          }
-      	  //std::cout<<"session created \n";
-		  
-		  MetaGraphDef graph_def;
-		  status = ReadBinaryProto(Env::Default(), pathToGraph, &graph_def);
-		  if (!status.ok()) {
-		  	throw runtime_error("Error reading graph definition from " + pathToGraph + ": " + status.ToString());
-		  }
-		  // Add the graph to the session
-			status = session->Create(graph_def.graph_def());
-			if (!status.ok()) {
-				throw runtime_error("Error creating graph: " + status.ToString());
-			}
-			// Read weights from the saved checkpoint
-			Tensor checkpointPathTensor(DT_STRING, TensorShape());
-			checkpointPathTensor.scalar<std::string>()() = checkpointPath;
-			status = session->Run(
-					{{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
-					{},
-					{graph_def.saver_def().restore_op_name()},
-					nullptr);
-			if (!status.ok()) {
-				throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
-			}
-			tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
 			//std::cout<<"created input_tensor\n";
 			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
 			input_tensor_mapped(0,0) = nbr_pj->d;
@@ -185,12 +182,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             0.0;
-
-
-			// Free any resources used by the session
-			session->Close(); 
-			//std::cout<<"session closed \n";
-
 
 			
        }else{
@@ -310,7 +301,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       }
     }
   }
-
+// Free any resources used by the session
+  session->Close(); 
+//std::cout<<"session closed \n";
   Compute_Polarization_Energy( system, data );
 }
 
