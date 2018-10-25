@@ -155,9 +155,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  tensorflow::Tensor a(tensorflow::DT_DOUBLE, tensorflow::TensorShape());
 		  a.scalar<double>()() = 3.0;
 		  std::cout<<"created a!\n";
-		  tensorflow::TensorShape inputshape;
-		  inputshape.InsertDim(2,7);
-		  tensorflow::Tensor input_tensor(tensorflow::DT_DOUBLE, inputshape);
+		  //tensorflow::TensorShape inputshape;
+		  //inputshape.InsertDim(2,7);
+		  tensorflow::Tensor input_tensor(tensorflow::DT_DOUBLE, tensorflow::TensorShape({2,7}));
 		  std::cout<<"created input_tensor\n";
 		  auto input_tensor_mapped = input_tensor.tensor<double, 2>();
 		  std::cout<<"created input_tensor_map\n";
@@ -190,9 +190,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout << status.ToString() << "\n";
 		  }
 	      	  std::cout<<"run model on input\n";
-		  Tensor result = outputs[0];
+		  /*Tensor result = outputs[0];
 		  auto result_map = result.tensor.tensor<double, 2>();
-		  std::cout<<"result:"<<result_map(0,0)<<endl'
+		  std::cout<<"result:"<<result_map(0,0)<<endl;*/
 
 		  data->my_en.e_vdW = double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
 		  data->my_en.e_ele = double(outputs[0].matrix<float>()(0,1)) ; //= outputs[1].scalar<double>();
