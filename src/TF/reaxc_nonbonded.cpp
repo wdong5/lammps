@@ -186,7 +186,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			}
 			std::cout<<"run model on input\n";
 
-			auto output_map = outputs[0].tensor.tensor<double, 2>();
+			auto output_map = outputs(0).tensor.tensor<double, 2>();
 
 			data->my_en.e_vdW = double(output_map(0,0)) ; 
 			std::cout<< output_map(0,0)<<"\n";
