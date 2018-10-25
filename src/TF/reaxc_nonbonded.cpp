@@ -122,12 +122,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       //std::cout<<"before flag\n";
 	    
       if (flag) {
+	  gettimeofday( &start_bp8, NULL );
         if (mlflag == 1){
           twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
                                            [ system->my_atoms[j].type ]);
           //std::cout<<"after mlflag\n";
 
-          gettimeofday( &start_bp8, NULL );
+
           //construct a ML graph;
 		  const std::string pathToGraph  = "./models/my-model.meta";
 		  const std::string checkpointPath  = "./models/my-model";
@@ -190,8 +191,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			session->Close(); 
 			//std::cout<<"session closed \n";
 
-			gettimeofday( &end_bp8, NULL );
-			bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+
 			
        }else{
           r_ij = nbr_pj->d;
@@ -260,7 +260,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                 re6 = pow( twbp->lgre, 6.0 );
                 e_lg = -(twbp->lgcij/( r_ij6 + re6 ));
                 data->my_en.e_vdW += Tap * e_lg;
-
                 de_lg = -6.0 * e_lg *  r_ij5 / ( r_ij6 + re6 ) ;
                 CEvd += dTap * e_lg + Tap * de_lg / r_ij;
               }
@@ -277,12 +276,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
-		
-	  std::cout<< "tensor type: " <<"\t";
-	  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
-	  std::cout<<typeid(CEvd).name()<<"\n";
 
         }
+		gettimeofday( &end_bp8, NULL );
+		bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+		std::cout<<"bp8 time:"<<bp8<<" \n";
 
      
 
