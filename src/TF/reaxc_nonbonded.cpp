@@ -190,7 +190,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::cout << status.ToString() << "\n";
 		  }
 	      	  std::cout<<"run model on input\n";
-		  Tensor result = outputs[0];
+		  /*Tensor result = outputs[0];
 		  auto result_map = result.tensor.tensor<double, 2>();
 		  std::cout<<"result:"<<result_map(0,0)<<endl;
 		  data->my_en.e_vdW = result_map(0,0);
@@ -199,7 +199,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  CEclmb =            result_map(0,3);
 		  
 
-		  /*data->my_en.e_vdW = double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
+		  data->my_en.e_vdW = double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
 		  data->my_en.e_ele = double(outputs[0].matrix<float>()(0,1)) ; //= outputs[1].scalar<double>();
 		  CEvd =              double(outputs[0].matrix<float>()(0,2)) ;
 		  CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;
