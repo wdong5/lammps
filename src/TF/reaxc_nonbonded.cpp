@@ -124,6 +124,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
+          twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
+                                           [ system->my_atoms[j].type ]);
           std::cout<<"after mlflag\n";
 
           gettimeofday( &start_bp8, NULL );
@@ -163,15 +165,15 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<<"created input_tensor_map\n";
 		  input_tensor_mapped(0,0) = nbr_pj->d;
 		  std::cout<< input_tensor_mapped(0,0)<<"\n";
-		  input_tensor_mapped(0,1) = 1.0;
+		  input_tensor_mapped(0,1) = twbp->gamma;
 		  std::cout<< input_tensor_mapped(0,1)<<"\n";
-		  input_tensor_mapped(0,2) = 2.0;
+		  input_tensor_mapped(0,2) = twbp->D;
 		  std::cout<< input_tensor_mapped(0,2)<<"\n";
-		  input_tensor_mapped(0,3) = 1.0//twbp->alpha;
-		  input_tensor_mapped(0,4) = 1.0//twbp->r_vdW;
+		  input_tensor_mapped(0,3) = twbp->alpha//twbp->alpha;
+		  input_tensor_mapped(0,4) = twbp->r_vdW;
 		  std::cout<< input_tensor_mapped(0,4)<<"\n";
-		  input_tensor_mapped(0,5) = 1.0//twbp->lgcij;
-		  input_tensor_mapped(0,6) = 1.0//twbp->gamma_w;
+		  input_tensor_mapped(0,5) = twbp->lgcij;
+		  input_tensor_mapped(0,6) = twbp->gamma_w;
 		  std::cout<< input_tensor_mapped(0,6)<<"\n";
 		  /*input_tensor.matrix<float>()(0,0) = static_cast<double>(nbr_pj->d);
 		  input_tensor.matrix<float>()(0,1) = static_cast<double>(twbp->gamma);
