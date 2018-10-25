@@ -154,7 +154,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
-			gettimeofday( &start_bp8, NULL );
+
 			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
 										   [ system->my_atoms[j].type ]);
           //std::cout<<"after mlflag\n";
@@ -183,11 +183,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             0.0;
 			
-			gettimeofday( &end_bp8, NULL );
-			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-			std::cout<<"bp8 time:"<<bp8<<" \n";
+
 			
        }else{
+  		  gettimeofday( &start_bp8, NULL );
           r_ij = nbr_pj->d;
           twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
                                            [ system->my_atoms[j].type ]);
@@ -269,6 +268,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
 
         }
+			gettimeofday( &end_bp8, NULL );
+			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+			std::cout<<"bp8 time:"<<bp8<<" \n";
 
       /* tally into per-atom energy */
       if( system->pair_ptr->evflag || system->pair_ptr->vflag_atom) {
