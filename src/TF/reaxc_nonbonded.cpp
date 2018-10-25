@@ -169,7 +169,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  std::cout<< input_tensor_mapped(0,1)<<"\n";
 		  input_tensor_mapped(0,2) = twbp->D;
 		  std::cout<< input_tensor_mapped(0,2)<<"\n";
-		  input_tensor_mapped(0,3) = twbp->alpha//twbp->alpha;
+		  input_tensor_mapped(0,3) = twbp->alpha;
 		  input_tensor_mapped(0,4) = twbp->r_vdW;
 		  std::cout<< input_tensor_mapped(0,4)<<"\n";
 		  input_tensor_mapped(0,5) = twbp->lgcij;
