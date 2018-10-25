@@ -182,7 +182,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             0.0;
-
+		gettimeofday( &end_bp8, NULL );
+		bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+		std::cout<<"bp8 time:"<<bp8<<" \n";
 			
        }else{
           r_ij = nbr_pj->d;
@@ -269,9 +271,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
 
         }
-		gettimeofday( &end_bp8, NULL );
-		bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-		std::cout<<"bp8 time:"<<bp8<<" \n";
+
 
      
 
