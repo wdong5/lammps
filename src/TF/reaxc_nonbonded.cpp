@@ -163,7 +163,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			}
 
 
-		}
+
        }else{
           r_ij = nbr_pj->d;
           twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
