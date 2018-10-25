@@ -194,7 +194,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			data->my_en.e_ele = double(output_map(0,1)) ; 
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
-			//e_vdw =             0.0;
+			e_vdW =             0.0;
 			//CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;//= outputs[3].scalar<double>();
 
 			// Free any resources used by the session
