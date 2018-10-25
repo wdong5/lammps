@@ -131,8 +131,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           gettimeofday( &start_bp8, NULL );
           //construct a ML graph;
-		  const std::string pathToGraph  = "./models/my_model.meta";
-		  const std::string checkpointPath  = "./models/my_model";
+		  const std::string pathToGraph  = "./models/my-model.meta";
+		  const std::string checkpointPath  = "./models/my-model";
           tensorflow::Session* session;
           tensorflow::Status status = NewSession(SessionOptions(), &session);
           if (!status.ok()) {
@@ -161,8 +161,24 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			if (!status.ok()) {
 				throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
 			}
-
-
+			tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+			std::cout<<"created input_tensor\n";
+			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
+			std::cout<<"created input_tensor_map\n";
+			input_tensor_mapped(0,0) = nbr_pj->d;
+			std::cout<< input_tensor_mapped(0,0)<<"\n";
+			input_tensor_mapped(0,1) = twbp->gamma;
+			std::cout<< input_tensor_mapped(0,1)<<"\n";
+			input_tensor_mapped(0,2) = twbp->D;
+			std::cout<< input_tensor_mapped(0,2)<<"\n";
+			input_tensor_mapped(0,3) = twbp->alpha;
+			input_tensor_mapped(0,4) = twbp->r_vdW;
+			std::cout<< input_tensor_mapped(0,4)<<"\n";
+			input_tensor_mapped(0,5) = twbp->lgcij;
+			input_tensor_mapped(0,6) = twbp->gamma_w;
+			std::cout<< input_tensor_mapped(0,6)<<"\n";
+			std::cout<<"check point"<<endl;
+			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 
        }else{
           r_ij = nbr_pj->d;
