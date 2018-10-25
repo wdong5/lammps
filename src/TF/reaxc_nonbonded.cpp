@@ -153,10 +153,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       //std::cout<<"before flag\n";
 	    
       if (flag) {
-	  gettimeofday( &start_bp8, NULL );
         if (mlflag == 1){
-          twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
-                                           [ system->my_atoms[j].type ]);
+			gettimeofday( &start_bp8, NULL );
+			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
+										   [ system->my_atoms[j].type ]);
           //std::cout<<"after mlflag\n";
 			//std::cout<<"created input_tensor\n";
 			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
@@ -182,9 +182,10 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             0.0;
-		gettimeofday( &end_bp8, NULL );
-		bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-		std::cout<<"bp8 time:"<<bp8<<" \n";
+			
+			gettimeofday( &end_bp8, NULL );
+			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+			std::cout<<"bp8 time:"<<bp8<<" \n";
 			
        }else{
           r_ij = nbr_pj->d;
@@ -205,8 +206,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           dTap = dTap * r_ij + 3*workspace->Tap[3];
           dTap = dTap * r_ij + 2*workspace->Tap[2];
           dTap += workspace->Tap[1]/r_ij;
-
-
 
           /*vdWaals Calculations*/
           if(system->reax_param.gp.vdw_type==1 || system->reax_param.gp.vdw_type==3)
@@ -256,7 +255,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                 de_lg = -6.0 * e_lg *  r_ij5 / ( r_ij6 + re6 ) ;
                 CEvd += dTap * e_lg + Tap * de_lg / r_ij;
               }
-
 	  }
 
           /*Coulomb Calculations*/
@@ -271,9 +269,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
 
         }
-
-
-     
 
       /* tally into per-atom energy */
       if( system->pair_ptr->evflag || system->pair_ptr->vflag_atom) {
@@ -306,8 +301,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 //std::cout<<"session closed \n";
   Compute_Polarization_Energy( system, data );
 }
-
-
 
 void Tabulated_vdW_Coulomb_Energy( reax_system *system,control_params *control,
                                    simulation_data *data, storage *workspace,
