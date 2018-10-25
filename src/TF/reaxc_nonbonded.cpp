@@ -119,8 +119,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           }
         }
       }
-
-
       //std::cout<<"before flag\n";
 	    
       if (flag) {
@@ -164,20 +162,13 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
 			//std::cout<<"created input_tensor\n";
 			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
-			//std::cout<<"created input_tensor_map\n";
 			input_tensor_mapped(0,0) = nbr_pj->d;
-			//std::cout<< input_tensor_mapped(0,0)<<"\n";
 			input_tensor_mapped(0,1) = twbp->gamma;
-			//std::cout<< input_tensor_mapped(0,1)<<"\n";
 			input_tensor_mapped(0,2) = twbp->D;
-			//std::cout<< input_tensor_mapped(0,2)<<"\n";
 			input_tensor_mapped(0,3) = twbp->alpha;
 			input_tensor_mapped(0,4) = twbp->r_vdW;
-			//std::cout<< input_tensor_mapped(0,4)<<"\n";
 			input_tensor_mapped(0,5) = twbp->lgcij;
 			input_tensor_mapped(0,6) = twbp->gamma_w;
-			//std::cout<< input_tensor_mapped(0,6)<<"\n";
-			//std::cout<<"check point"<<endl;
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 			std::vector<tensorflow::Tensor> outputs;
 			status = session->Run(inputs, {"output"}, {}, &outputs);
@@ -186,16 +177,14 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			}
 			//std::cout<<"run model on input\n";
 			Tensor result = outputs[0];
-
-			auto output_map = result[0].tensor<float, 2>();
-
+			auto output_map = result.tensor<float, 2>();
 			data->my_en.e_vdW = double(output_map(0,0)) ; 
 			//std::cout<< output_map(0,0)<<"\n";
 			data->my_en.e_ele = double(output_map(0,1)) ; 
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             0.0;
-			//CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;//= outputs[3].scalar<double>();
+
 
 			// Free any resources used by the session
 			session->Close(); 
