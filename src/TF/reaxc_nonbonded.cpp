@@ -26,6 +26,7 @@
 #include <tensorflow/core/platform/env.h>
 #include <tensorflow/core/public/session.h>
 #include <tensorflow/core/framework/tensor.h>
+#include <tensorflow/core/protobuf/meta_graph.pb.h>
 
 //#include "tensorflow/core/framework/unique_tensor_references.h"
 
@@ -130,92 +131,38 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           gettimeofday( &start_bp8, NULL );
           //construct a ML graph;
+		  const std::string pathToGraph  = "./models/my_model.meta";
+		  const std::string checkpointPath  = "./models/my_model";
           tensorflow::Session* session;
           tensorflow::Status status = NewSession(SessionOptions(), &session);
           if (!status.ok()) {
             std::cout << status.ToString() << "\n";
           }
       	  std::cout<<"session created \n";
-
-          // Read in the protobuf graph we exported
-          // (The path seems to be relative to the cwd. Keep this in mind
-          // when using `bazel run` since the cwd isn't where you call
-          // `bazel run` but from inside a temp folder.)
-          GraphDef graph_def;
-          status = tensorflow::ReadBinaryProto(Env::Default(), "./graph.pb", &graph_def);
-          if (!status.ok()) {
-            std::cout << status.ToString() << "\n";
-          }
-          std::cout<<"graph.pb loaded\n";
-
-         // Add the graph to the session
-          status = session->Create(graph_def);
-          if (!status.ok()) {
-            std::cout << status.ToString() << "\n";
-          }
-		  std::cout<<"created graph\n";
-		  tensorflow::Tensor a(tensorflow::DT_DOUBLE, tensorflow::TensorShape());
-		  a.scalar<double>()() = 3.0;
-		  std::cout<<"created a!\n";
-		  //tensorflow::TensorShape inputshape;
-		  //inputshape.InsertDim(2,7);
-		  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
-		  std::cout<<"created input_tensor\n";
-		  auto input_tensor_mapped = input_tensor.tensor<float, 2>();
-		  std::cout<<"created input_tensor_map\n";
-		  input_tensor_mapped(0,0) = nbr_pj->d;
-		  std::cout<< input_tensor_mapped(0,0)<<"\n";
-		  input_tensor_mapped(0,1) = twbp->gamma;
-		  std::cout<< input_tensor_mapped(0,1)<<"\n";
-		  input_tensor_mapped(0,2) = twbp->D;
-		  std::cout<< input_tensor_mapped(0,2)<<"\n";
-		  input_tensor_mapped(0,3) = twbp->alpha;
-		  input_tensor_mapped(0,4) = twbp->r_vdW;
-		  std::cout<< input_tensor_mapped(0,4)<<"\n";
-		  input_tensor_mapped(0,5) = twbp->lgcij;
-		  input_tensor_mapped(0,6) = twbp->gamma_w;
-		  std::cout<< input_tensor_mapped(0,6)<<"\n";
-		  /*input_tensor.matrix<float>()(0,0) = static_cast<double>(nbr_pj->d);
-		  input_tensor.matrix<float>()(0,1) = static_cast<double>(twbp->gamma);
-		  input_tensor.matrix<float>()(0,2) = static_cast<double>(twbp->D);
-		  input_tensor.matrix<float>()(0,3) = static_cast<double>(twbp->alpha);
-		  input_tensor.matrix<float>()(0,4) = static_cast<double>(twbp->r_vdW);
-		  input_tensor.matrix<float>()(0,5) = static_cast<double>(twbp->lgcij);
-		  input_tensor.matrix<float>()(0,6) = static_cast<double>(twbp->gamma_w);*/
-		  std::cout<<"check point"<<endl;
-		  std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
-		  std::cout<<"give values for input_tensor!"<<endl;
-		  std::vector<tensorflow::Tensor> outputs;
-		  // Run the session, evaluating our "c" operation from the graph
-		  status = session->Run(inputs, {"output"}, {}, &outputs);
+		  
+		  MetaGraphDef graph_def;
+		  status = ReadBinaryProto(Env::Default(), pathToGraph, &graph_def);
 		  if (!status.ok()) {
-			std::cout << status.ToString() << "\n";
+		  	throw runtime_error("Error reading graph definition from " + pathToGraph + ": " + status.ToString());
 		  }
-	      	  std::cout<<"run model on input\n";
-		  /*Tensor result = outputs[0];
-		  auto result_map = result.tensor.tensor<double, 2>();
-		  std::cout<<"result:"<<result_map(0,0)<<endl;
-		  data->my_en.e_vdW = result_map(0,0);
-		  data->my_en.e_ele = result_map(0,1);
-		  CEvd =              result_map(0,2);
-		  CEclmb =            result_map(0,3);*/
-		  
+		  // Add the graph to the session
+			status = session->Create(graph_def.graph_def());
+			if (!status.ok()) {
+				throw runtime_error("Error creating graph: " + status.ToString());
+			}
+			// Read weights from the saved checkpoint
+			Tensor checkpointPathTensor(DT_STRING, TensorShape());
+			checkpointPathTensor.scalar<std::string>()() = checkpointPath;
+			status = session->Run(
+					{{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
+					{},
+					{graph_def.saver_def().restore_op_name()},
+					nullptr);
+			if (!status.ok()) {
+				throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
+			}
 
-		  data->my_en.e_vdW = double(outputs[0].matrix<float>()(0,0)) ; //= outputs[0].scalar<double>();
-		  data->my_en.e_ele = double(outputs[0].matrix<float>()(0,1)) ; //= outputs[1].scalar<double>();
-		  CEvd =              double(outputs[0].matrix<float>()(0,2)) ;
-		  CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;
-		  std::cout<< "tensor type: " <<"\t";
-		  std::cout<<typeid(outputs[0].matrix<float>()(0, 0)).name()<<"\n";
-		  std::cout<<typeid(data->my_en.e_vdW).name() <<"\n";
-		  std::cout<<typeid(CEvd).name()<<"\n";
-		  
-		  // Free any resources used by the session
-		  session->Close(); 
-		  std::cout<<"session closed \n";
 
-          gettimeofday( &end_bp8, NULL );
-          bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 		  
        }else{
           r_ij = nbr_pj->d;
