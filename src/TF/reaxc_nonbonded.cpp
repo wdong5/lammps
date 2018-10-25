@@ -181,7 +181,31 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 			std::vector<tensorflow::Tensor> outputs;
 			status = session->Run(inputs, {"output"}, {}, &outputs);
-			td::cout<<"check point2"<<endl;
+			if (!status.ok()) {
+				std::cout << status.ToString() << "\n";
+			}
+			std::cout<<"run model on input\n";
+			auto result_map = result.tensor.tensor<double, 2>();
+			std::cout<<"result:"<<result_map(0,0)<<endl;
+			data->my_en.e_vdW = result_map(0,0);
+			data->my_en.e_ele = result_map(0,1);
+			CEvd =              result_map(0,2);
+			CEclmb =            result_map(0,3);*/
+			auto output_map = outputs[0].tensor.tensor<double, 2>();
+
+			data->my_en.e_vdW = double(output_map(0,0)) ; 
+			data->my_en.e_ele = double(output_map(0,1)) ; 
+			CEvd =              double(output_map(0,2)) ;
+			CEclmb =            double(output_map(0,3)) ;
+			e_vdw =             0.0;
+			//CEclmb =            double(outputs[0].matrix<float>()(0,3)) ;//= outputs[3].scalar<double>();
+
+			// Free any resources used by the session
+			session->Close(); 
+			std::cout<<"session closed \n";
+
+			gettimeofday( &end_bp8, NULL );
+			bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;*/
 			
        }else{
           r_ij = nbr_pj->d;
