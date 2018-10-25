@@ -80,7 +80,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   reax_list *far_nbrs;
  
   
-  int mlflag = 0;// use a ml model when flag =1 and continue original code when flag = 0;
+  int mlflag = 1;// use a ml model when flag =1 and continue original code when flag = 0;
  
   
   // Tallying variables:
@@ -280,7 +280,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
         }
 		gettimeofday( &end_bp8, NULL );
 		bp8 = bp8 + 1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-		std::cout<<"bp8 time:"<<bp8<<" \n";
+		//std::cout<<"bp8 time:"<<bp8<<" \n";
 
      
 
