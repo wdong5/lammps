@@ -57,8 +57,8 @@ using namespace std;
 using namespace LAMMPS_NS;
 using namespace tensorflow;
 
-extern struct timeval start_bp8, end_bp8;
-extern double bp8;
+extern struct timeval start_bp8_ml, end_bp8_ml, start_bp8, end_bp8;
+extern double bp8, bp8_ml;
 
 void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                          simulation_data *data, storage *workspace,
@@ -154,7 +154,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
-
+			gettimeofday( &start_bp8_ml, NULL );
 			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
 										   [ system->my_atoms[j].type ]);
           //std::cout<<"after mlflag\n";
@@ -182,8 +182,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             double(output_map(0,4)) ;
-			
-
+			gettimeofday( &end_bp8_ml, NULL );
+			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			
        }else{
   		  gettimeofday( &start_bp8, NULL );
@@ -266,11 +267,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
-
+		  gettimeofday( &end_bp8, NULL );
+		  bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+		  std::cout<<"bp8 time:"<<bp8<<" \n";
         }
-			gettimeofday( &end_bp8, NULL );
-			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-			std::cout<<"bp8 time:"<<bp8<<" \n";
+
 
       /* tally into per-atom energy */
       if( system->pair_ptr->evflag || system->pair_ptr->vflag_atom) {
