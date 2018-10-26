@@ -182,6 +182,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             double(output_map(0,4)) ;
+			e_core = 0.0;
+			e_lg = 0.0;
 			gettimeofday( &end_bp8_ml, NULL );
 			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
 			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
@@ -210,6 +212,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
           /*vdWaals Calculations*/
           if(system->reax_param.gp.vdw_type==1 || system->reax_param.gp.vdw_type==3)
             { // shielding
+			  std::cout<<"chose1 \n";
               powr_vdW1 = pow(r_ij, p_vdW1);
               powgi_vdW1 = pow( 1.0 / twbp->gamma_w, p_vdW1);
 
@@ -227,6 +230,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                 Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) * dfn13;
             }
           else{ // no shielding
+		  	std::cout<<"chose2 \n";
             exp1 = exp( twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
             exp2 = exp( 0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
 
@@ -239,6 +243,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           if(system->reax_param.gp.vdw_type==2 || system->reax_param.gp.vdw_type==3)
             { // inner wall
+			 std::cout<<"chose3 \n";
               e_core = twbp->ecore * exp(twbp->acore * (1.0-(r_ij/twbp->rcore)));
               data->my_en.e_vdW += Tap * e_core;
 
@@ -247,6 +252,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
               //  lg correction, only if lgvdw is yes
               if (control->lgflag) {
+				std::cout<<"chose4 \n";
                 r_ij5 = pow( r_ij, 5.0 );
                 r_ij6 = pow( r_ij, 6.0 );
                 re6 = pow( twbp->lgre, 6.0 );
