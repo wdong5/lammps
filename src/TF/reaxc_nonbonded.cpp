@@ -154,7 +154,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
-			//gettimeofday( &start_bp8_ml, NULL );
+			gettimeofday( &start_bp8_ml, NULL );
 			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
 										   [ system->my_atoms[j].type ]);
             //std::cout<<"after mlflag\n";
@@ -182,9 +182,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEvd =              double(output_map(0,2)) ;
 			CEclmb =            double(output_map(0,3)) ;
 			e_vdW =             double(output_map(0,4)) ;
-			//gettimeofday( &end_bp8_ml, NULL );
-			//bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
-			//std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
+			gettimeofday( &end_bp8_ml, NULL );
+			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			
        }else{
   		  gettimeofday( &start_bp8, NULL );
