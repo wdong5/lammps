@@ -36,8 +36,8 @@ using namespace LAMMPS_NS;
 /* ----------------------------------------------------------------------
    main program to drive LAMMPS
 ------------------------------------------------------------------------- */
-struct timeval start_bp8, end_bp8;
-double bp8; 
+struct timeval start_bp8, end_bp8, start_bp8_ml, end_bp8_ml;
+double bp8, bp8_ml; 
 int main(int argc, char **argv)
 {
   MPI_Init(&argc,&argv);
