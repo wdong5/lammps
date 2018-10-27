@@ -233,7 +233,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             exp2 = exp( 0.5 * twbp->alpha * (1.0 - r_ij / twbp->r_vdW) );
 
             e_vdW = twbp->D * (exp1 - 2.0 * exp2);
-            e_vdW_tmp = Tap * e_vdW;
 
             CEvd = dTap * e_vdW -
               Tap * twbp->D * (twbp->alpha / twbp->r_vdW) * (exp1 - exp2) / r_ij;
@@ -258,7 +257,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
                 CEvd += dTap * e_lg + Tap * de_lg / r_ij;
               }
 	  }
-
           /*Coulomb Calculations*/
           dr3gamij_1 = ( r_ij * r_ij * r_ij + twbp->gamma );
           dr3gamij_3 = pow( dr3gamij_1 , 0.33333333333333 );
@@ -272,13 +270,14 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 		  //bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 		  //std::cout<<"bp8 time:"<<bp8<<" \n";
         }
-		data->my_en.e_vdW += e_vdW_tmp;
+		data->my_en.e_vdW += Tap * e_vdW;
 		data->my_en.e_ele += e_ele;
 
 
       /* tally into per-atom energy */
+	  
       if( system->pair_ptr->evflag || system->pair_ptr->vflag_atom) {
-		std::cout<<"enter1"<<bp8<<" \n";
+		//enter here
         pe_vdw = Tap * (e_vdW + e_core + e_lg);
         rvec_ScaledSum( delij, 1., system->my_atoms[i].x,
                               -1., system->my_atoms[j].x );
@@ -288,7 +287,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
       }
 
       if( control->virial == 0 ) {
-		std::cout<<"enter2:"<<bp8<<" \n";
+		//enter here
         rvec_ScaledAdd( workspace->f[i], -(CEvd + CEclmb), nbr_pj->dvec );
         rvec_ScaledAdd( workspace->f[j], +(CEvd + CEclmb), nbr_pj->dvec );
       }
