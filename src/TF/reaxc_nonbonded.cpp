@@ -176,17 +176,16 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			//std::cout<<"run model on input\n";
 			Tensor result = outputs[0];
 			auto output_map = result.tensor<float, 2>();
-			data->my_en.e_vdW = double(output_map(0,0)) ; 
-			//std::cout<< output_map(0,0)<<"\n";
-			data->my_en.e_ele = double(output_map(0,1)) ; 
-			CEvd =              double(output_map(0,2)) ;
-			CEclmb =            double(output_map(0,3)) ;
-			e_vdW =             double(output_map(0,4)) ;
-			e_core = 0.0;
-			e_lg = 0.0;
-			gettimeofday( &end_bp8_ml, NULL );
-			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
-			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
+			Tap =               double(output_map(0,0)) ; 
+			e_ele =             double(output_map(0,1)) ;
+			e_vdW =             double(output_map(0,2)) ;
+			CEvd =              double(output_map(0,3)) ;
+			CEclmb =            double(output_map(0,4)) ;
+			
+			
+			//gettimeofday( &end_bp8_ml, NULL );
+			//bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+			//std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			
        }else{
   		  gettimeofday( &start_bp8, NULL );
