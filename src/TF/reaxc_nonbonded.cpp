@@ -93,7 +93,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_core = 0;
   e_vdW = 0;
   e_lg = de_lg = 0.0;
-			gettimeofday( &start_bp8_ml, NULL );
+  gettimeofday( &start_bp8_ml, NULL );
   //construct a ML graph;
   const std::string pathToGraph  = "./models_small/my-model.meta";
   const std::string checkpointPath  = "./models_small/my-model";
@@ -128,11 +128,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
   auto input_tensor_mapped = input_tensor.tensor<float, 2>();
   std::vector<tensorflow::Tensor> outputs;
-  Tensor result = outputs[0];
-  auto output_map = result.tensor<float, 2>();
-			gettimeofday( &end_bp8_ml, NULL );
-			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
-			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
+
+
+  gettimeofday( &end_bp8_ml, NULL );
+  bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+  std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
   
   for( i = 0; i < natoms; ++i ) {
     if (system->my_atoms[i].type < 0) continue;
@@ -163,7 +163,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
-
+			gettimeofday( &start_bp8, NULL );
 			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
 										   [ system->my_atoms[j].type ]);
             //std::cout<<"after mlflag\n";
@@ -183,12 +183,16 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 				std::cout << status.ToString() << "\n";
 			}
 			std::cout<<"run model on input\n";*/
+			Tensor result = outputs[0];
+			auto output_map = result.tensor<float, 2>();
 			Tap =               double(output_map(0,0)) ; 
 			e_ele =             double(output_map(0,1)) ;
 			e_vdW =             double(output_map(0,2)) ;
 			CEvd =              double(output_map(0,3)) ;
 			CEclmb =            double(output_map(0,4)) ;
-
+			gettimeofday( &end_bp8, NULL );
+			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+			std::cout<<"bp8 time:"<<bp8<<" \n";
 
 			
        }else{
@@ -269,9 +273,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 
           CEclmb = C_ele * system->my_atoms[i].q * system->my_atoms[j].q *
             ( dTap -  Tap * r_ij / dr3gamij_1 ) / dr3gamij_3;
-		  //gettimeofday( &end_bp8, NULL );
-		  //bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-		  //std::cout<<"bp8 time:"<<bp8<<" \n";
+		  gettimeofday( &end_bp8, NULL );
+		  bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+		  std::cout<<"bp8 time:"<<bp8<<" \n";
         }
 		data->my_en.e_vdW += Tap * e_vdW;
 		data->my_en.e_ele += e_ele;
