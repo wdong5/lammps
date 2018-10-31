@@ -94,8 +94,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_vdW = 0;
   e_lg = de_lg = 0.0;
   //construct a ML graph;
-  const std::string pathToGraph  = "./models/my-model.meta";
-  const std::string checkpointPath  = "./models/my-model";
+  const std::string pathToGraph  = "./models_small/my-model.meta";
+  const std::string checkpointPath  = "./models_small/my-model";
   tensorflow::Session* session;
   tensorflow::Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
