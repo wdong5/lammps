@@ -93,7 +93,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_core = 0;
   e_vdW = 0;
   e_lg = de_lg = 0.0;
-
+			gettimeofday( &start_bp8_ml, NULL );
   //construct a ML graph;
   const std::string pathToGraph  = "./models_small/my-model.meta";
   const std::string checkpointPath  = "./models_small/my-model";
@@ -130,7 +130,9 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   std::vector<tensorflow::Tensor> outputs;
   Tensor result = outputs[0];
   auto output_map = result.tensor<float, 2>();
-  
+			gettimeofday( &end_bp8_ml, NULL );
+			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
   
   for( i = 0; i < natoms; ++i ) {
     if (system->my_atoms[i].type < 0) continue;
@@ -166,7 +168,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 										   [ system->my_atoms[j].type ]);
             //std::cout<<"after mlflag\n";
 			//std::cout<<"created input_tensor\n";
-			gettimeofday( &start_bp8_ml, NULL );
+
 			input_tensor_mapped(0,0) = nbr_pj->d;
 			input_tensor_mapped(0,1) = twbp->gamma;
 			input_tensor_mapped(0,2) = twbp->D;
@@ -186,9 +188,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			e_vdW =             double(output_map(0,2)) ;
 			CEvd =              double(output_map(0,3)) ;
 			CEclmb =            double(output_map(0,4)) ;
-			gettimeofday( &end_bp8_ml, NULL );
-			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
-			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
+
+
 			
        }else{
   		  gettimeofday( &start_bp8, NULL );
