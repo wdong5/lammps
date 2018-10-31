@@ -127,6 +127,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   }
   tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
   auto input_tensor_mapped = input_tensor.tensor<float, 2>();
+  std::vector<tensorflow::Tensor> outputs;
   gettimeofday( &end_bp8_ml, NULL );
   bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
   std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
@@ -166,8 +167,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             //std::cout<<"after mlflag\n";
 			//std::cout<<"created input_tensor\n";
 			gettimeofday( &start_bp8, NULL );
-
-
 			input_tensor_mapped(0,0) = nbr_pj->d;
 			input_tensor_mapped(0,1) = twbp->gamma;
 			input_tensor_mapped(0,2) = twbp->D;
@@ -175,14 +174,21 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			input_tensor_mapped(0,4) = twbp->r_vdW;
 			input_tensor_mapped(0,5) = twbp->lgcij;
 			input_tensor_mapped(0,6) = twbp->gamma_w;
-
+			gettimeofday( &end_bp8, NULL );
+			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+			std::cout<<"bp1 time:"<<bp8<<" \n";
+			gettimeofday( &start_bp8, NULL );
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 			status = session->Run(inputs, {"output"}, {}, &outputs);
 			/*if (!status.ok()) {
 				std::cout << status.ToString() << "\n";
 			}
 			std::cout<<"run model on input\n";*/
-			std::vector<tensorflow::Tensor> outputs;
+						gettimeofday( &end_bp8, NULL );
+			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
+			std::cout<<"bp2 time:"<<bp8<<" \n";
+			gettimeofday( &start_bp8, NULL );
+
 			Tensor result = outputs[0];
 			auto output_map = result.tensor<float, 2>();
 			Tap =               double(output_map(0,0)) ; 
@@ -192,7 +198,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEclmb =            double(output_map(0,4)) ;
 			gettimeofday( &end_bp8, NULL );
 			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
-			std::cout<<"bp8 time:"<<bp8<<" \n";
+			std::cout<<"bp3 time:"<<bp8<<" \n";
 
 			
        }else{
