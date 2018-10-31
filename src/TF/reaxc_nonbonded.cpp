@@ -93,7 +93,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_core = 0;
   e_vdW = 0;
   e_lg = de_lg = 0.0;
-  
+
   //construct a ML graph;
   const std::string pathToGraph  = "./models_small/my-model.meta";
   const std::string checkpointPath  = "./models_small/my-model";
@@ -174,7 +174,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			input_tensor_mapped(0,4) = twbp->r_vdW;
 			input_tensor_mapped(0,5) = twbp->lgcij;
 			input_tensor_mapped(0,6) = twbp->gamma_w;
-			gettimeofday( &end_bp8_ml, NULL );
+
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
 			/*status = session->Run(inputs, {"output"}, {}, &outputs);
 			if (!status.ok()) {
@@ -186,6 +186,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			e_vdW =             double(output_map(0,2)) ;
 			CEvd =              double(output_map(0,3)) ;
 			CEclmb =            double(output_map(0,4)) ;
+			gettimeofday( &end_bp8_ml, NULL );
 			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
 			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			
