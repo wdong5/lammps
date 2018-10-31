@@ -154,7 +154,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	    
       if (flag) {
         if (mlflag == 1){
-			gettimeofday( &start_bp8_ml, NULL );
+
 			twbp = &(system->reax_param.tbp[ system->my_atoms[i].type ]
 										   [ system->my_atoms[j].type ]);
             //std::cout<<"after mlflag\n";
@@ -167,7 +167,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			input_tensor_mapped(0,4) = twbp->r_vdW;
 			input_tensor_mapped(0,5) = twbp->lgcij;
 			input_tensor_mapped(0,6) = twbp->gamma_w;
+			gettimeofday( &start_bp8_ml, NULL );
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
+						gettimeofday( &end_bp8_ml, NULL );
+			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
+			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			std::vector<tensorflow::Tensor> outputs;
 			status = session->Run(inputs, {"output"}, {}, &outputs);
 			if (!status.ok()) {
@@ -183,9 +187,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			CEclmb =            double(output_map(0,4)) ;
 			
 			
-			gettimeofday( &end_bp8_ml, NULL );
-			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
-			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
+
 			
        }else{
   		  gettimeofday( &start_bp8, NULL );
