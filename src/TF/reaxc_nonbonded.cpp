@@ -95,8 +95,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_lg = de_lg = 0.0;
   gettimeofday( &start_bp8_ml, NULL );
   //construct a ML graph;
-  const std::string pathToGraph  = "./models_small/my-model.meta";
-  const std::string checkpointPath  = "./models_small/my-model";
+  const std::string pathToGraph  = "./models/my-model.meta";
+  const std::string checkpointPath  = "./models/my-model";
   tensorflow::Session* session;
   tensorflow::Status status = NewSession(SessionOptions(), &session);
   if (!status.ok()) {
@@ -184,7 +184,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 				std::cout << status.ToString() << "\n";
 			}
 			std::cout<<"run model on input\n";*/
-						gettimeofday( &end_bp8, NULL );
+			gettimeofday( &end_bp8, NULL );
 			bp8 =  1000000 * (end_bp8.tv_sec - start_bp8.tv_sec) + end_bp8.tv_usec - start_bp8.tv_usec;
 			std::cout<<"bp2 time:"<<bp8<<" \n";
 			gettimeofday( &start_bp8, NULL );
