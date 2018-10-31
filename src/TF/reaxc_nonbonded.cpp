@@ -93,6 +93,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   e_core = 0;
   e_vdW = 0;
   e_lg = de_lg = 0.0;
+  
   //construct a ML graph;
   const std::string pathToGraph  = "./models_small/my-model.meta";
   const std::string checkpointPath  = "./models_small/my-model";
@@ -102,29 +103,32 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 	std::cout << status.ToString() << "\n";
   }
   //std::cout<<"session created \n";
-  
+
   MetaGraphDef graph_def;
   status = ReadBinaryProto(Env::Default(), pathToGraph, &graph_def);
   if (!status.ok()) {
 	throw runtime_error("Error reading graph definition from " + pathToGraph + ": " + status.ToString());
   }
   // Add the graph to the session
-	status = session->Create(graph_def.graph_def());
-	if (!status.ok()) {
-		throw runtime_error("Error creating graph: " + status.ToString());
-	}
-	// Read weights from the saved checkpoint
-	Tensor checkpointPathTensor(DT_STRING, TensorShape());
-	checkpointPathTensor.scalar<std::string>()() = checkpointPath;
-	status = session->Run(
-			{{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
-			{},
-			{graph_def.saver_def().restore_op_name()},
-			nullptr);
-	if (!status.ok()) {
-		throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
-	}
-	tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+  status = session->Create(graph_def.graph_def());
+  if (!status.ok()) {
+	throw runtime_error("Error creating graph: " + status.ToString());
+  }
+// Read weights from the saved checkpoint
+  Tensor checkpointPathTensor(DT_STRING, TensorShape());
+  checkpointPathTensor.scalar<std::string>()() = checkpointPath;
+  status = session->Run(
+		{{ graph_def.saver_def().filename_tensor_name(), checkpointPathTensor },},
+		{},
+		{graph_def.saver_def().restore_op_name()},
+		nullptr);
+  if (!status.ok()) {
+	throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
+  }
+  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+  auto input_tensor_mapped = input_tensor.tensor<float, 2>();
+
+
   for( i = 0; i < natoms; ++i ) {
     if (system->my_atoms[i].type < 0) continue;
     start_i = Start_Index(i, far_nbrs);
@@ -160,7 +164,6 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
             //std::cout<<"after mlflag\n";
 			//std::cout<<"created input_tensor\n";
 			gettimeofday( &start_bp8_ml, NULL );
-			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
 			input_tensor_mapped(0,0) = nbr_pj->d;
 			input_tensor_mapped(0,1) = twbp->gamma;
 			input_tensor_mapped(0,2) = twbp->D;
@@ -168,10 +171,11 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 			input_tensor_mapped(0,4) = twbp->r_vdW;
 			input_tensor_mapped(0,5) = twbp->lgcij;
 			input_tensor_mapped(0,6) = twbp->gamma_w;
+			gettimeofday( &end_bp8_ml, NULL );
 			bp8_ml =  1000000 * (end_bp8_ml.tv_sec - start_bp8_ml.tv_sec) + end_bp8_ml.tv_usec - start_bp8_ml.tv_usec;
 			std::cout<<"bp8_ml time:"<<bp8_ml<<" \n";
 			std::vector<std::pair<string, tensorflow::Tensor>> inputs = {{ "input", input_tensor }};
-						gettimeofday( &end_bp8_ml, NULL );
+
 
 			std::vector<tensorflow::Tensor> outputs;
 			status = session->Run(inputs, {"output"}, {}, &outputs);
