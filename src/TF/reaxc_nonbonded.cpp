@@ -127,7 +127,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   }
   tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
   auto input_tensor_mapped = input_tensor.tensor<float, 2>();
-  std::vector<tensorflow::Tensor> outputs;
+
 
 
   gettimeofday( &end_bp8_ml, NULL );
@@ -183,6 +183,7 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 				std::cout << status.ToString() << "\n";
 			}
 			std::cout<<"run model on input\n";*/
+			std::vector<tensorflow::Tensor> outputs;
 			Tensor result = outputs[0];
 			auto output_map = result.tensor<float, 2>();
 			Tap =               double(output_map(0,0)) ; 
