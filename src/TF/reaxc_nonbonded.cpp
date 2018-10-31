@@ -125,8 +125,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
   if (!status.ok()) {
 	throw runtime_error("Error loading checkpoint from " + checkpointPath + ": " + status.ToString());
   }
-  tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
-  auto input_tensor_mapped = input_tensor.tensor<float, 2>();
+
+
 
 
 
@@ -168,7 +168,8 @@ void vdW_Coulomb_Energy( reax_system *system, control_params *control,
 										   [ system->my_atoms[j].type ]);
             //std::cout<<"after mlflag\n";
 			//std::cout<<"created input_tensor\n";
-
+			tensorflow::Tensor input_tensor(tensorflow::DT_FLOAT, tensorflow::TensorShape({1,7}));
+			auto input_tensor_mapped = input_tensor.tensor<float, 2>();
 			input_tensor_mapped(0,0) = nbr_pj->d;
 			input_tensor_mapped(0,1) = twbp->gamma;
 			input_tensor_mapped(0,2) = twbp->D;
